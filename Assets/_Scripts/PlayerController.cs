@@ -4,18 +4,18 @@ using System.Collections;
 public class PlayerController : MonoBehaviour
 {
     Rigidbody2D rb;
+    Animator animator;
 
     [Header("Movement")]
     public float speed = 8f;
     public float jumpForce = 15f;
-    public float movementCheckDistance = 0.6f;
 
     [Header("Dash")]
     public float dashSpeed = 25f;
     public float dashDuration = 0.2f;
     bool isDashing;
 
-    [Header("WallSlide & WallJump")]
+    [Header("Wall Slide & Jump")]
     public Transform wallCheck;
     public Transform groundCheck;
     public float wallCheckDistance = 0.5f;
@@ -28,6 +28,9 @@ public class PlayerController : MonoBehaviour
     public float stickTime = 3f;
     public float wallJumpCooldown = 0.3f;
 
+    [Header("Movement Block")]
+    public float movementCheckDistance = 0.6f;
+
     bool isGrounded;
     bool isTouchingWall;
     bool isWallSliding;
@@ -38,6 +41,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
         wallStickCounter = stickTime;
     }
 
@@ -45,10 +49,8 @@ public class PlayerController : MonoBehaviour
     {
         horizontal = Input.GetAxisRaw("Horizontal");
 
-        if (horizontal > 0 && !isFacingRight())
-            Flip();
-        else if (horizontal < 0 && isFacingRight())
-            Flip();
+        if (horizontal > 0 && !isFacingRight()) Flip();
+        else if (horizontal < 0 && isFacingRight()) Flip();
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
@@ -62,13 +64,7 @@ public class PlayerController : MonoBehaviour
             StartCoroutine(Dash());
 
         WallSlideCheck();
-    }
-
-    void Flip()
-    {
-        Vector3 currentScale = transform.localScale;
-        currentScale.x *= -1;
-        transform.localScale = currentScale;
+        UpdateAnimator();
     }
 
     void FixedUpdate()
@@ -77,8 +73,6 @@ public class PlayerController : MonoBehaviour
 
         if (!isWallSliding)
         {
-            // ak hráè ide doprava (horizontal = 1), skontroluj èi môže
-            // ak hráè ide do¾ava (horizontal = -1), skontroluj èi môže
             if ((horizontal > 0 && !CanMoveInDirection(1)) || (horizontal < 0 && !CanMoveInDirection(-1)))
             {
                 rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
@@ -105,17 +99,14 @@ public class PlayerController : MonoBehaviour
 
     IEnumerator WallJump()
     {
-        canWallStick = false; // Doèasne zakáž prilepenie na stenu
-
+        canWallStick = false;
         float jumpDirection = isFacingRight() ? -1 : 1;
         rb.linearVelocity = new Vector2(wallJumpForceX * jumpDirection, wallJumpForceY);
-
         isWallSliding = false;
         wallStickCounter = stickTime;
 
         yield return new WaitForSeconds(wallJumpCooldown);
-
-        canWallStick = true; // znova umožni prilepenie
+        canWallStick = true;
     }
 
     IEnumerator Dash()
@@ -164,32 +155,49 @@ public class PlayerController : MonoBehaviour
         isTouchingWall = hit.collider != null;
     }
 
-    bool isFacingRight()
-    {
-        return transform.localScale.x > 0;
-    }
-
-    void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-
-        // WallCheck Raycast
-        Vector2 direction = isFacingRight() ? Vector2.right : Vector2.left;
-        Gizmos.DrawLine(wallCheck.position, (Vector2)wallCheck.position + direction * wallCheckDistance);
-
-        // GroundCheck Raycast
-        Gizmos.DrawLine(groundCheck.position, (Vector2)groundCheck.position + Vector2.down * groundCheckDistance);
-
-        // Movement Check Raycast
-        Gizmos.color = Color.blue;
-        Gizmos.DrawLine(transform.position, (Vector2)transform.position + Vector2.right * movementCheckDistance);
-        Gizmos.DrawLine(transform.position, (Vector2)transform.position + Vector2.left * movementCheckDistance);
-    }
-
     bool CanMoveInDirection(float dir)
     {
         Vector2 direction = dir > 0 ? Vector2.right : Vector2.left;
         RaycastHit2D hit = Physics2D.Raycast(transform.position, direction, movementCheckDistance, groundLayer);
         return hit.collider == null;
+    }
+
+    void Flip()
+    {
+        Vector3 scale = transform.localScale;
+        scale.x *= -1;
+        transform.localScale = scale;
+    }
+
+    bool isFacingRight()
+    {
+        return transform.localScale.x > 0;
+    }
+
+    void UpdateAnimator()
+    {
+        animator.SetBool(AnimationStrings.IsMoving, horizontal != 0);
+        animator.SetBool(AnimationStrings.IsGrounded, isGrounded);
+        animator.SetFloat(AnimationStrings.YVelocity, rb.linearVelocity.y);
+    }
+
+    void OnDrawGizmos()
+    {
+        if (wallCheck != null)
+        {
+            Gizmos.color = Color.red;
+            Vector2 direction = isFacingRight() ? Vector2.right : Vector2.left;
+            Gizmos.DrawLine(wallCheck.position, (Vector2)wallCheck.position + direction * wallCheckDistance);
+        }
+
+        if (groundCheck != null)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawLine(groundCheck.position, (Vector2)groundCheck.position + Vector2.down * groundCheckDistance);
+        }
+
+        Gizmos.color = Color.blue;
+        Gizmos.DrawLine(transform.position, (Vector2)transform.position + Vector2.right * movementCheckDistance);
+        Gizmos.DrawLine(transform.position, (Vector2)transform.position + Vector2.left * movementCheckDistance);
     }
 }
