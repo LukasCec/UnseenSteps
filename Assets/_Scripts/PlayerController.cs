@@ -30,13 +30,16 @@ public class PlayerController : MonoBehaviour
 
     [Header("Movement Block")]
     public float movementCheckDistance = 0.6f;
-
     bool isGrounded;
     bool isTouchingWall;
     bool isWallSliding;
     bool canWallStick = true;
     float wallStickCounter;
     float horizontal;
+
+    [Header("Attack Settings")]
+    public GameObject attackHitbox;
+    private bool isAttacking;
 
     void Start()
     {
@@ -58,6 +61,12 @@ public class PlayerController : MonoBehaviour
                 Jump();
             else if (isWallSliding || isTouchingWall)
                 StartCoroutine(WallJump());
+        }
+
+        if (Input.GetMouseButtonDown(0) && !isAttacking && isGrounded)
+        {
+            isAttacking = true;
+            animator.SetTrigger(AnimationStrings.Attack);
         }
 
         if (Input.GetKeyDown(KeyCode.LeftShift) && !isDashing)
@@ -200,4 +209,16 @@ public class PlayerController : MonoBehaviour
         Gizmos.DrawLine(transform.position, (Vector2)transform.position + Vector2.right * movementCheckDistance);
         Gizmos.DrawLine(transform.position, (Vector2)transform.position + Vector2.left * movementCheckDistance);
     }
+
+    public void EnableAttackHitbox()
+    {
+        attackHitbox.SetActive(true);
+    }
+
+    public void DisableAttackHitbox()
+    {
+        attackHitbox.SetActive(false);
+        isAttacking = false;
+    }
+
 }
