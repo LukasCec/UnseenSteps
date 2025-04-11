@@ -4,14 +4,14 @@ public class EnemyAttackHitbox : MonoBehaviour
 {
     public int damage = 1;
 
-    void OnTriggerEnter2D(Collider2D other)
+    private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
         {
-            var player = other.GetComponent<PlayerHealth>();
+            PlayerHealth player = other.GetComponent<PlayerHealth>();
             if (player != null)
             {
-                player.TakeDamage(damage);
+                player.TakeDamage(damage, transform.position);
             }
         }
     }

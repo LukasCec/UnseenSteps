@@ -5,6 +5,7 @@ public class PlayerController : MonoBehaviour
 {
     Rigidbody2D rb;
     Animator animator;
+    bool wasGroundedLastFrame;
 
     [Header("Movement")]
     public float speed = 8f;
@@ -14,6 +15,9 @@ public class PlayerController : MonoBehaviour
     public float dashSpeed = 25f;
     public float dashDuration = 0.2f;
     bool isDashing;
+    [Header("Dash Cooldown")]
+    public float dashCooldown = 4f;
+    private float lastDashTime = -Mathf.Infinity;
 
     [Header("Wall Slide & Jump")]
     public Transform wallCheck;
@@ -41,6 +45,11 @@ public class PlayerController : MonoBehaviour
     public GameObject attackHitbox;
     private bool isAttacking;
 
+    [Header("VFX")]
+    public GameObject dashEffectPrefab;
+    public GameObject jumpEffectPrefab;
+    public bool isStunned = false;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -51,6 +60,7 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         horizontal = Input.GetAxisRaw("Horizontal");
+        if (isStunned) return;
 
         if (horizontal > 0 && !isFacingRight()) Flip();
         else if (horizontal < 0 && isFacingRight()) Flip();
@@ -69,8 +79,10 @@ public class PlayerController : MonoBehaviour
             animator.SetTrigger(AnimationStrings.Attack);
         }
 
-        if (Input.GetKeyDown(KeyCode.LeftShift) && !isDashing)
+        if (Input.GetKeyDown(KeyCode.LeftShift) && !isDashing && Time.time - lastDashTime >= dashCooldown)
+        {
             StartCoroutine(Dash());
+        }
 
         WallSlideCheck();
         UpdateAnimator();
@@ -104,6 +116,8 @@ public class PlayerController : MonoBehaviour
     void Jump()
     {
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+        Vector3 spawnPos = groundCheck.position;
+        Instantiate(jumpEffectPrefab, spawnPos, Quaternion.identity);
     }
 
     IEnumerator WallJump()
@@ -120,11 +134,17 @@ public class PlayerController : MonoBehaviour
 
     IEnumerator Dash()
     {
+        
         isDashing = true;
+        lastDashTime = Time.time; // tu sa spustí cooldown
+        Instantiate(dashEffectPrefab, transform.position, Quaternion.identity);
+
         float originalGravity = rb.gravityScale;
         rb.gravityScale = 0f;
         rb.linearVelocity = new Vector2(horizontal * dashSpeed, 0f);
+
         yield return new WaitForSeconds(dashDuration);
+
         rb.gravityScale = originalGravity;
         isDashing = false;
     }
@@ -154,7 +174,25 @@ public class PlayerController : MonoBehaviour
     void CheckGround()
     {
         RaycastHit2D hit = Physics2D.Raycast(groundCheck.position, Vector2.down, groundCheckDistance, groundLayer);
+
+        bool wasGrounded = isGrounded;
         isGrounded = hit.collider != null;
+
+        //  Detekuj dopad (bol vo vzduchu ->eraz je na zemi)
+        if (!wasGrounded && isGrounded)
+        {
+            SpawnLandingEffect();
+        }
+
+        wasGroundedLastFrame = isGrounded;
+    }
+
+    void SpawnLandingEffect()
+    {
+        if (jumpEffectPrefab != null)
+        {
+            Instantiate(jumpEffectPrefab, groundCheck.position, Quaternion.identity);
+        }
     }
 
     void CheckWall()
@@ -212,7 +250,31 @@ public class PlayerController : MonoBehaviour
 
     public void EnableAttackHitbox()
     {
+        attackHitbox.SetActive(false);
         attackHitbox.SetActive(true);
+
+        // Manuálne poškodenie ak nepriatelia už stoja v hitboxe
+        BoxCollider2D col = attackHitbox.GetComponent<BoxCollider2D>();
+        Vector2 hitboxPos = (Vector2)attackHitbox.transform.position + col.offset;
+        Vector2 hitboxSize = col.size;
+
+        Collider2D[] hits = Physics2D.OverlapBoxAll(
+         hitboxPos,
+         hitboxSize,
+         0f
+        );
+
+        foreach (var hit in hits)
+        {
+            if (hit.CompareTag("Enemy"))
+            {
+                Enemy enemy = hit.GetComponent<Enemy>();
+                if (enemy != null)
+                {
+                    enemy.TakeDamage(1);
+                }
+            }
+        }
     }
 
     public void DisableAttackHitbox()
@@ -220,5 +282,13 @@ public class PlayerController : MonoBehaviour
         attackHitbox.SetActive(false);
         isAttacking = false;
     }
+
+    public IEnumerator Stun(float duration)
+    {
+        isStunned = true;
+        yield return new WaitForSeconds(duration);
+        isStunned = false;
+    }
+
 
 }
