@@ -224,6 +224,9 @@ MonoBehaviour:
   wallJumpCooldown: 0.3
   movementCheckDistance: 0.25
   attackHitbox: {fileID: 8028199543541507529}
+  dashEffectPrefab: {fileID: 5513733649221406610, guid: fe66811b132d02f46900a2e4f1d515d8, type: 3}
+  jumpEffectPrefab: {fileID: 6463334891485378783, guid: d9d9a49421c54364e9dbe648b62109c4, type: 3}
+  isStunned: 0
 --- !u!95 &565232495284404144
 Animator:
   serializedVersion: 7
@@ -259,6 +262,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 5
+  knockbackForce: 10
 --- !u!1 &6095939309536450333
 GameObject:
   m_ObjectHideFlags: 0
