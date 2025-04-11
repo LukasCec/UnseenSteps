@@ -40,7 +40,7 @@ public class EnemyShooter : MonoBehaviour
     {
         CheckGround();
 
-        if (PlayerInRange())
+        if (PlayerInRange() && HasLineOfSight())
         {
             LookAtPlayer();
             StopAndShoot();
@@ -68,6 +68,19 @@ public class EnemyShooter : MonoBehaviour
         }
     }
 
+    bool HasLineOfSight()
+    {
+        if (player == null) return false;
+
+        Vector2 origin = firePoint.position;
+        Vector2 direction = (player.position - firePoint.position).normalized;
+        float distance = Vector2.Distance(origin, player.position);
+
+        RaycastHit2D hit = Physics2D.Raycast(origin, direction, distance, groundLayer);
+
+        // Ak nieèo zablokuje cestu -> hráè je za stenou
+        return hit.collider == null;
+    }
     void Patrol()
     {
         CheckWall(); // flipuj len poèas pohybu
@@ -191,6 +204,12 @@ public class EnemyShooter : MonoBehaviour
         {
             Gizmos.color = Color.cyan;
             Gizmos.DrawLine(firePoint.position, firePoint.position + Vector3.right * (isFacingRight ? 0.5f : -0.5f));
+        }
+
+        if (player != null)
+        {
+            Gizmos.color = Color.blue;
+            Gizmos.DrawLine(firePoint.position, player.position);
         }
     }
 }
