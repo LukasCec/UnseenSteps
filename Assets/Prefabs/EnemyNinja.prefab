@@ -14,6 +14,8 @@ GameObject:
   - component: {fileID: 1045740355783268008}
   - component: {fileID: 5947402401100077331}
   - component: {fileID: 778722823339128431}
+  - component: {fileID: 4410558816090967043}
+  - component: {fileID: 8349802213606024783}
   m_Layer: 9
   m_Name: EnemyNinja
   m_TagString: Enemy
@@ -201,19 +203,41 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e7b278dc18097146a5ef2ebd6c243ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 3
+  detectionRange: 0.49
+  attackCooldown: 1.5
+  attackHitbox: {fileID: 4229782410137462912}
+--- !u!114 &4410558816090967043
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3698002109502231032}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 415cd6ca53e29144b8361f74f2f2ea7e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 3
+--- !u!114 &8349802213606024783
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3698002109502231032}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8031320ca1ddff340a752b9fa7e7f8d9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   moveSpeed: 2
-  detectionRange: 0.54
+  groundCheck: {fileID: 6160464073953457377}
+  wallCheck: {fileID: 2035825358104211765}
   groundLayer:
     serializedVersion: 2
     m_Bits: 64
-  playerLayer:
-    serializedVersion: 2
-    m_Bits: 1
-  groundCheck: {fileID: 6160464073953457377}
-  wallCheck: {fileID: 2035825358104211765}
-  attackHitbox: {fileID: 4229782410137462912}
-  attackCooldown: 1.5
+  isFacingRight: 1
 --- !u!1 &3916249067820998814
 GameObject:
   m_ObjectHideFlags: 0

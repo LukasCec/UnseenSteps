@@ -27,10 +27,11 @@ public class AttackHitbox : MonoBehaviour
 
             if (Time.time - lastHitTime[other.gameObject] >= damageCooldown)
             {
-                Enemy enemy = other.GetComponent<Enemy>();
-                if (enemy != null)
+                // Namiesto 'Enemy enemy = ...' použijeme 'EnemyHealth eh = ...'
+                EnemyHealth eh = other.GetComponent<EnemyHealth>();
+                if (eh != null)
                 {
-                    enemy.TakeDamage(damage);
+                    eh.TakeDamage(damage);
                     lastHitTime[other.gameObject] = Time.time;
                 }
             }

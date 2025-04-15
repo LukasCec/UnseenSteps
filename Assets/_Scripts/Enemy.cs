@@ -1,79 +1,57 @@
 using UnityEngine;
 using System.Collections;
 
+[RequireComponent(typeof(EnemyHealth))]
+[RequireComponent(typeof(EnemyWalk))]
+[RequireComponent(typeof(Rigidbody2D))]
 public class Enemy : MonoBehaviour
 {
-    [Header("Stats")]
-    public int health = 3;
-    public float moveSpeed = 2f;
+    [Header("Attack Settings")]
     public float detectionRange = 1.5f;
-    public LayerMask groundLayer;
-    public LayerMask playerLayer;
-
-    [Header("Checkers")]
-    public Transform groundCheck;
-    public Transform wallCheck;
+    public float attackCooldown = 1f;
     public GameObject attackHitbox;
 
-    [Header("Attack")]
-    public float attackCooldown = 1f;
     private bool isAttacking;
     private bool canAttack = true;
 
-    private bool isGrounded;
-    private bool isFacingRight = true;
+    // Komponenty
+    private EnemyHealth enemyHealth;  // starï¿½ sa o HP
+    private EnemyWalk enemyWalk;      // starï¿½ sa o pohyb + flip okraj/stena
     private Rigidbody2D rb;
     private Animator animator;
     private Transform player;
-    private SpriteRenderer sr;
 
-    void Start()
+    void Awake()
     {
+        // Naï¿½ï¿½tame pripojenï¿½ komponenty
+        enemyHealth = GetComponent<EnemyHealth>();
+        enemyWalk = GetComponent<EnemyWalk>();
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         player = GameObject.FindGameObjectWithTag("Player")?.transform;
-        attackHitbox.SetActive(false); // ensure it's off at start
-        sr = GetComponent<SpriteRenderer>();
+
+        if (attackHitbox != null)
+            attackHitbox.SetActive(false); // Preventï¿½vne vypneme
     }
 
     void FixedUpdate()
     {
-        CheckGround();
-        CheckWall();
+        // Ak zrovna ï¿½toï¿½ï¿½me, mï¿½ï¿½eme zablokovaï¿½ movement
+        // (alebo ponechaï¿½, ak chcete, aby nepriateï¿½ mohol chodiï¿½ aj poï¿½as animï¿½cie ï¿½toku)
+        if (isAttacking)
+        {
+            rb.linearVelocity = Vector2.zero;
+            enemyWalk.enabled = false;
+        }
+        else
+        {
+            enemyWalk.enabled = true;
+        }
+
         DetectPlayer();
-
-        if (!isAttacking)
-            Patrol();
     }
 
-    void Patrol()
-    {
-        rb.linearVelocity = new Vector2((isFacingRight ? 1 : -1) * moveSpeed, rb.linearVelocity.y);
-        animator.SetBool("isMoving", true);
-    }
-
-    void CheckGround()
-    {
-        isGrounded = Physics2D.Raycast(groundCheck.position, Vector2.down, 0.3f, groundLayer);
-        if (!isGrounded)
-            Flip();
-    }
-
-    void CheckWall()
-    {
-        RaycastHit2D hit = Physics2D.Raycast(wallCheck.position, isFacingRight ? Vector2.right : Vector2.left, 0.5f, groundLayer);
-        if (hit.collider != null)
-            Flip();
-    }
-
-    void Flip()
-    {
-        isFacingRight = !isFacingRight;
-        Vector3 scale = transform.localScale;
-        scale.x *= -1;
-        transform.localScale = scale;
-    }
-
+    /// <summary> Kontrola, ï¿½i je hrï¿½ï¿½ v dosahu na ï¿½tok, a prï¿½padnï¿½ spustenie </summary>
     void DetectPlayer()
     {
         if (player == null) return;
@@ -82,115 +60,49 @@ public class Enemy : MonoBehaviour
 
         if (distance <= detectionRange && canAttack)
         {
-            StartCoroutine(Attack());
+            StartCoroutine(AttackRoutine());
         }
     }
 
-    IEnumerator Attack()
+    /// <summary> Coroutine na spracovanie ï¿½toku </summary>
+    IEnumerator AttackRoutine()
     {
         isAttacking = true;
         canAttack = false;
-        rb.linearVelocity = Vector2.zero;
-        animator.SetTrigger("isAttacking");
 
+        // Spusti animï¿½ciu ï¿½toku
+        if (animator != null)
+            animator.SetTrigger("isAttacking");
+
+        // Poï¿½kï¿½me cooldown
         yield return new WaitForSeconds(attackCooldown);
 
         isAttacking = false;
         canAttack = true;
     }
 
-    //  Tieto metódy spúšajú/zastavujú hitbox - pripojené na animáciu
+    //  Tieto metï¿½dy spï¿½ï¿½ï¿½ajï¿½/zastavujï¿½ hitbox - pripojenï¿½ na animï¿½ciu (Animation Event)
     public void EnableAttackHitbox()
     {
-        // Reset aktivácie
+        if (attackHitbox == null) return;
         attackHitbox.SetActive(false);
         attackHitbox.SetActive(true);
 
-        // ROVNO aplikuj damage na všetkıch hráèov vo vnútri hitboxu
-        BoxCollider2D col = attackHitbox.GetComponent<BoxCollider2D>();
-        Vector2 hitboxPos = (Vector2)attackHitbox.transform.position + col.offset;
-        Vector2 hitboxSize = col.size;
-
-        Collider2D[] hits = Physics2D.OverlapBoxAll(
-    hitboxPos,
-    hitboxSize,
-    0f
-);
-
-        foreach (var hit in hits)
-        {
-            if (hit.CompareTag("Player"))
-            {
-                PlayerHealth player = hit.GetComponent<PlayerHealth>();
-                if (player != null)
-                {
-                    player.TakeDamage(1, transform.position);
-                }
-            }
-        }
+        // Mï¿½ï¿½ete tu priamo rieï¿½iï¿½ damage hrï¿½ï¿½ovi (OverlapBox...), 
+        // alebo to nechaï¿½ na skript v AttackHitbox
     }
-
 
     public void DisableAttackHitbox()
     {
+        if (attackHitbox == null) return;
         attackHitbox.SetActive(false);
     }
 
-    public void TakeDamage(int dmg)
-    {
-        health -= dmg;
-        StartCoroutine(BlinkEffect()); // zavolá blikanie
-
-        if (health <= 0)
-        {
-            Destroy(gameObject);
-        }
-    }
-
-
-    IEnumerator BlinkEffect()
-    {
-        int blinkCount = 3;
-        float blinkDuration = 0.1f;
-
-        for (int i = 0; i < blinkCount; i++)
-        {
-            sr.color = new Color(1, 1, 1, 0.2f); // prieh¾adnı
-            yield return new WaitForSeconds(blinkDuration);
-            sr.color = Color.white; // spä na normál
-            yield return new WaitForSeconds(blinkDuration);
-        }
-    }
-
-    // Editor Debug Gizmos
+    // --- Pomocnï¿½ debug vizuï¿½ly ---
     void OnDrawGizmosSelected()
     {
-        if (groundCheck != null)
-        {
-            Gizmos.color = Color.green;
-            Gizmos.DrawLine(groundCheck.position, groundCheck.position + Vector3.down * 0.2f);
-        }
-
-        if (wallCheck != null)
-        {
-            Gizmos.color = Color.yellow;
-            Vector3 dir = isFacingRight ? Vector3.right : Vector3.left;
-            Gizmos.DrawLine(wallCheck.position, wallCheck.position + dir * 0.1f);
-        }
-
+        // ï¿½ervenï¿½ guliï¿½ka okolo nepriateï¿½a naznaï¿½ujï¿½ca detectionRange
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, detectionRange);
-
-        if (attackHitbox != null)
-        {
-            Gizmos.color = Color.magenta;
-            BoxCollider2D col = attackHitbox.GetComponent<BoxCollider2D>();
-            if (col != null)
-            {
-                Gizmos.matrix = attackHitbox.transform.localToWorldMatrix;
-                Gizmos.DrawWireCube(col.offset, col.size);
-                Gizmos.matrix = Matrix4x4.identity;
-            }
-        }
     }
 }

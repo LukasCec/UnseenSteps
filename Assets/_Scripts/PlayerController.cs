@@ -255,7 +255,7 @@ public class PlayerController : MonoBehaviour
 
         // Manuálne poškodenie ak nepriatelia už stoja v hitboxe
         BoxCollider2D col = attackHitbox.GetComponent<BoxCollider2D>();
-        Vector2 hitboxPos = (Vector2)attackHitbox.transform.position + col.offset;
+        Vector2 hitboxPos = attackHitbox.transform.TransformPoint(col.offset);
         Vector2 hitboxSize = col.size;
 
         Collider2D[] hits = Physics2D.OverlapBoxAll(
@@ -268,10 +268,11 @@ public class PlayerController : MonoBehaviour
         {
             if (hit.CompareTag("Enemy"))
             {
-                Enemy enemy = hit.GetComponent<Enemy>();
-                if (enemy != null)
+                // Neh¾adáme viac skript 'Enemy', ale priamo 'EnemyHealth'
+                EnemyHealth enemyHealth = hit.GetComponent<EnemyHealth>();
+                if (enemyHealth != null)
                 {
-                    enemy.TakeDamage(1);
+                    enemyHealth.TakeDamage(1);
                 }
             }
         }

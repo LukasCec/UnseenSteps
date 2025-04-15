@@ -1,36 +1,34 @@
 using UnityEngine;
 using System.Collections;
 
+[RequireComponent(typeof(EnemyHealth))]
+[RequireComponent(typeof(EnemyWalk))]
+[RequireComponent(typeof(Rigidbody2D))]
 public class EnemyShooter : MonoBehaviour
 {
-    [Header("Stats")]
-    public int health = 3;
-    public float moveSpeed = 2f;
+    [Header("Shooter Settings")]
     public float detectionRange = 6f;
-    public LayerMask groundLayer;
-
-    [Header("Checkers")]
-    public Transform groundCheck;
-    public Transform wallCheck;
     public Transform firePoint;
     public GameObject projectilePrefab;
-
-    [Header("Attack")]
     public float attackCooldown = 1.5f;
+
     private bool canAttack = true;
 
-    [Header("Flip Delay")]
-    public float flipCooldown = 0.5f;
-    private float lastFlipTime;
-
-    private bool isGrounded;
-    private bool isFacingRight = true;
+    // Komponenty
+    private EnemyHealth enemyHealth;  // star· sa o HP
+    private EnemyWalk enemyWalk;      // star· sa o pohyb + flip okraj/stena
     private Rigidbody2D rb;
     private Animator animator;
     private Transform player;
 
-    void Start()
+    [Header("Flip Settings")]
+    public float flipCooldown = 0.5f;
+    private float lastFlipTime = 0f;
+
+    void Awake()
     {
+        enemyHealth = GetComponent<EnemyHealth>();
+        enemyWalk = GetComponent<EnemyWalk>();
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         player = GameObject.FindGameObjectWithTag("Player")?.transform;
@@ -38,177 +36,116 @@ public class EnemyShooter : MonoBehaviour
 
     void FixedUpdate()
     {
-        CheckGround();
+        if (player == null)
+        {
+            enemyWalk.enabled = true;
+            return;
+        }
 
+        // ak je hrac v dosahu + viditelny
         if (PlayerInRange() && HasLineOfSight())
         {
+            // zastav a strielaj
+            enemyWalk.enabled = false;
+            rb.linearVelocity = Vector2.zero;
+
+            // Uistime sa, ze animacia nebude "walking"
+            animator.SetBool(EnemyShooterAnimationStrings.IsMoving, false);
+
             LookAtPlayer();
             StopAndShoot();
         }
         else
         {
-            Patrol();
+            // hrac mimo dosahu -> patrola
+            enemyWalk.enabled = true;
+            // nastavit isMoving = true, nech hr· "walk" anim·ciu
+            animator.SetBool(EnemyShooterAnimationStrings.IsMoving, true);
         }
     }
 
-    void LookAtPlayer()
+    /// <summary> Skontroluje, Ëi je hr·Ë v detectionRange </summary>
+    bool PlayerInRange()
     {
-        if (player == null) return;
-
-        float xDiff = player.position.x - transform.position.x;
-        if (Mathf.Abs(xDiff) < 0.5f) return;
-        if (Time.time - lastFlipTime < flipCooldown) return;
-
-        bool playerOnRight = xDiff > 0;
-
-        if (playerOnRight && !isFacingRight || !playerOnRight && isFacingRight)
-        {
-            Flip();
-            lastFlipTime = Time.time;
-        }
+        return Vector2.Distance(transform.position, player.position) <= detectionRange;
     }
 
+    /// <summary> Skontroluje, Ëi nie je medzi mnou a hr·Ëom stena </summary>
     bool HasLineOfSight()
     {
-        if (player == null) return false;
-
         Vector2 origin = firePoint.position;
         Vector2 direction = (player.position - firePoint.position).normalized;
         float distance = Vector2.Distance(origin, player.position);
 
-        RaycastHit2D hit = Physics2D.Raycast(origin, direction, distance, groundLayer);
-
+        RaycastHit2D hit = Physics2D.Raycast(origin, direction, distance, enemyWalk.groundLayer);
         // Ak nieËo zablokuje cestu -> hr·Ë je za stenou
         return hit.collider == null;
     }
-    void Patrol()
+
+    /// <summary> OtoËÌme sa smerom k hr·Ëovi, ale len ak uplynul flipCooldown </summary>
+    void LookAtPlayer()
     {
-        CheckWall(); // flipuj len poËas pohybu
+        float xDiff = player.position.x - transform.position.x;
+        if (Mathf.Abs(xDiff) < 0.5f) return;
 
-        rb.linearVelocity = new Vector2((isFacingRight ? 1 : -1) * moveSpeed, rb.linearVelocity.y);
-        animator.SetBool("isMoving", true);
-    }
+        if (Time.time - lastFlipTime < flipCooldown) return;
 
-    void StopAndShoot()
-    {
-        rb.linearVelocity = Vector2.zero;
-        animator.SetBool("isMoving", false);
+        bool playerOnRight = (xDiff > 0);
+        bool isFacingRight = enemyWalk.isFacingRight;  // preËÌtame si aktu·lny stav z EnemyWalk
 
-        if (canAttack)
+        // Ak je hr·Ë v opaËnom smere, flipni
+        if (playerOnRight && !isFacingRight || !playerOnRight && isFacingRight)
         {
-            StartCoroutine(Shoot());
+            enemyWalk.Flip();
+            lastFlipTime = Time.time;
         }
     }
 
-    IEnumerator Shoot()
+    /// <summary>ZastavÌme a zaËneme strieæaù, pokiaæ mÙûeme</summary>
+    void StopAndShoot()
+    {
+        if (canAttack)
+            StartCoroutine(ShootRoutine());
+    }
+
+    IEnumerator ShootRoutine()
     {
         canAttack = false;
-        animator.SetTrigger("isAttacking");
 
-        yield return new WaitForSeconds(0.3f); // Ëakaj na moment v˝strelu (sync s anim·ciou)
+        // Spusti anim·ciu
+        animator.SetTrigger(EnemyShooterAnimationStrings.IsAttacking);
 
+      
+       
         ShootProjectile();
 
+        // cooldown
         yield return new WaitForSeconds(attackCooldown);
         canAttack = true;
     }
 
+    /// <summary> VytvorÌ strelu smerom k hr·Ëovi </summary>
     void ShootProjectile()
     {
+        if (projectilePrefab == null || firePoint == null || player == null) return;
+
         GameObject bullet = Instantiate(projectilePrefab, firePoint.position, Quaternion.identity);
         Rigidbody2D rbBullet = bullet.GetComponent<Rigidbody2D>();
         Vector2 dir = (player.position - firePoint.position).normalized;
-        rbBullet.linearVelocity = dir * 10f;
+        rbBullet.linearVelocity = dir * 10f; // r˝chlosù strely
     }
 
-    void CheckGround()
-    {
-        isGrounded = Physics2D.Raycast(groundCheck.position, Vector2.down, 0.3f, groundLayer);
-
-        // ak enemy pad· a nie je hr·Ë v dosahu, mÙûe flipn˙ù (napr. na hrane)
-        if (!isGrounded && !PlayerInRange())
-        {
-            Flip();
-        }
-    }
-
-    void CheckWall()
-    {
-        Vector2 direction = isFacingRight ? Vector2.right : Vector2.left;
-        RaycastHit2D hit = Physics2D.Raycast(wallCheck.position, direction, 0.5f, groundLayer);
-        if (hit.collider != null)
-        {
-            Flip();
-        }
-    }
-
-    void Flip()
-    {
-        isFacingRight = !isFacingRight;
-        Vector3 scale = transform.localScale;
-        scale.x *= -1;
-        transform.localScale = scale;
-    }
-
-    bool PlayerInRange()
-    {
-        if (player == null) return false;
-        return Vector2.Distance(transform.position, player.position) <= detectionRange;
-    }
-
-    public void TakeDamage(int dmg)
-    {
-        health -= dmg;
-        StartCoroutine(BlinkEffect());
-
-        if (health <= 0)
-        {
-            Destroy(gameObject);
-        }
-    }
-
-    IEnumerator BlinkEffect()
-    {
-        SpriteRenderer sr = GetComponent<SpriteRenderer>();
-        int blinkCount = 3;
-        float blinkDuration = 0.1f;
-
-        for (int i = 0; i < blinkCount; i++)
-        {
-            sr.color = new Color(1, 1, 1, 0.2f);
-            yield return new WaitForSeconds(blinkDuration);
-            sr.color = Color.white;
-            yield return new WaitForSeconds(blinkDuration);
-        }
-    }
-
+    // --- PomocnÈ debug vizu·ly ---
     void OnDrawGizmosSelected()
     {
+        // »erven· guliËka okolo nepriateæa naznaËuj˙ca detectionRange
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, detectionRange);
 
-        if (groundCheck != null)
-        {
-            Gizmos.color = Color.green;
-            Gizmos.DrawLine(groundCheck.position, groundCheck.position + Vector3.down * 0.3f);
-        }
-
-        if (wallCheck != null)
-        {
-            Gizmos.color = Color.yellow;
-            Vector3 dir = isFacingRight ? Vector3.right : Vector3.left;
-            Gizmos.DrawLine(wallCheck.position, wallCheck.position + dir * 0.5f);
-        }
-
-        if (firePoint != null)
+        // KeÔ je vybrat˝ firePoint, nakreslÌme Ëiaru smerom k hr·Ëovi
+        if (firePoint != null && player != null)
         {
             Gizmos.color = Color.cyan;
-            Gizmos.DrawLine(firePoint.position, firePoint.position + Vector3.right * (isFacingRight ? 0.5f : -0.5f));
-        }
-
-        if (player != null)
-        {
-            Gizmos.color = Color.blue;
             Gizmos.DrawLine(firePoint.position, player.position);
         }
     }
