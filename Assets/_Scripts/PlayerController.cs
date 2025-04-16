@@ -61,6 +61,10 @@ public class PlayerController : MonoBehaviour
     {
         horizontal = Input.GetAxisRaw("Horizontal");
         if (isStunned) return;
+        if (DialogueManager.GetInstance().dialogueIsPlaying)
+        {
+            return;
+        }
 
         if (horizontal > 0 && !isFacingRight()) Flip();
         else if (horizontal < 0 && isFacingRight()) Flip();
@@ -92,6 +96,10 @@ public class PlayerController : MonoBehaviour
     {
         if (isDashing) return;
 
+        if (DialogueManager.GetInstance().dialogueIsPlaying)
+        {
+            return;
+        }
         if (!isWallSliding)
         {
             if ((horizontal > 0 && !CanMoveInDirection(1)) || (horizontal < 0 && !CanMoveInDirection(-1)))
