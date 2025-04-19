@@ -20,20 +20,31 @@ public class AttackHitbox : MonoBehaviour
 
     void TryDamage(Collider2D other)
     {
+        // Ak tam ešte nemáme cooldown záznam, inicializuj ho
+        if (!lastHitTime.ContainsKey(other.gameObject))
+            lastHitTime[other.gameObject] = -damageCooldown;
+
+        // Máme cooldown pre túto kolíziu?
+        if (Time.time - lastHitTime[other.gameObject] < damageCooldown)
+            return;
+
+        // 1) Najprv skús rozbitný objekt
+        Breakable br = other.GetComponent<Breakable>();
+        if (br != null)
+        {
+            br.Hit();
+            lastHitTime[other.gameObject] = Time.time;
+            return;
+        }
+
+        // 2) Potom nepriate¾a
         if (other.CompareTag("Enemy"))
         {
-            if (!lastHitTime.ContainsKey(other.gameObject))
-                lastHitTime[other.gameObject] = -damageCooldown;
-
-            if (Time.time - lastHitTime[other.gameObject] >= damageCooldown)
+            EnemyHealth eh = other.GetComponent<EnemyHealth>();
+            if (eh != null)
             {
-                // Namiesto 'Enemy enemy = ...' použijeme 'EnemyHealth eh = ...'
-                EnemyHealth eh = other.GetComponent<EnemyHealth>();
-                if (eh != null)
-                {
-                    eh.TakeDamage(damage);
-                    lastHitTime[other.gameObject] = Time.time;
-                }
+                eh.TakeDamage(damage);
+                lastHitTime[other.gameObject] = Time.time;
             }
         }
     }

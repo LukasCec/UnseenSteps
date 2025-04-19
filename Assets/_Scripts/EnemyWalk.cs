@@ -9,8 +9,11 @@ public class EnemyWalk : MonoBehaviour
     public Transform wallCheck;
     public LayerMask groundLayer;
 
-    [Tooltip("Èi sa po štarte pozerá doprava")]
+    [Tooltip("ï¿½i sa po ï¿½tarte pozerï¿½ doprava")]
     public bool isFacingRight = true;
+
+    private float lastFlipTime;
+    public float flipCooldown = 0.2f; 
 
     private Rigidbody2D rb;
 
@@ -33,14 +36,13 @@ public class EnemyWalk : MonoBehaviour
 
     private void CheckGround()
     {
-        if (groundCheck == null) return;
+        if (Time.time - lastFlipTime < flipCooldown) return;
 
         bool isGrounded = Physics2D.Raycast(groundCheck.position, Vector2.down, 0.3f, groundLayer);
-
-        // Ak už nie je zem pod nohami -> flip
         if (!isGrounded)
         {
             Flip();
+            lastFlipTime = Time.time;
         }
     }
 
@@ -68,7 +70,7 @@ public class EnemyWalk : MonoBehaviour
         transform.localScale = scale;
     }
 
-    // --- Pomocné debug èiary v Scéne ---
+  
     void OnDrawGizmosSelected()
     {
         if (groundCheck != null)

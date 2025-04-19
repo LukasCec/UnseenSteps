@@ -49,6 +49,7 @@ public class PlayerController : MonoBehaviour
     public GameObject dashEffectPrefab;
     public GameObject jumpEffectPrefab;
     public bool isStunned = false;
+    public int damage = 1;
 
     void Start()
     {
@@ -258,30 +259,35 @@ public class PlayerController : MonoBehaviour
 
     public void EnableAttackHitbox()
     {
+        // resetneme a zapneme hitbox collider
         attackHitbox.SetActive(false);
         attackHitbox.SetActive(true);
 
-        // Manu·lne poökodenie ak nepriatelia uû stoja v hitboxe
+        // zÌskame BoxCollider2D a prepoËÌtame pozÌciu do world space
         BoxCollider2D col = attackHitbox.GetComponent<BoxCollider2D>();
-        Vector2 hitboxPos = attackHitbox.transform.TransformPoint(col.offset);
-        Vector2 hitboxSize = col.size;
+        Vector2 worldPos = attackHitbox.transform.TransformPoint(col.offset);
+        Vector2 size = col.size;
+        float angle = attackHitbox.transform.eulerAngles.z;
 
-        Collider2D[] hits = Physics2D.OverlapBoxAll(
-         hitboxPos,
-         hitboxSize,
-         0f
-        );
+        // OBSAHOVO HºAD¡ME VäETKY objekty v hitboxe
+        Collider2D[] hits = Physics2D.OverlapBoxAll(worldPos, size, angle);
 
-        foreach (var hit in hits)
+        foreach (var h in hits)
         {
-            if (hit.CompareTag("Enemy"))
+            // 1) najprv sk˙siù rozbitn˝ objekt
+            Breakable br = h.GetComponent<Breakable>();
+            if (br != null)
             {
-                // Nehæad·me viac skript 'Enemy', ale priamo 'EnemyHealth'
-                EnemyHealth enemyHealth = hit.GetComponent<EnemyHealth>();
-                if (enemyHealth != null)
-                {
-                    enemyHealth.TakeDamage(1);
-                }
+                br.Hit();
+                continue; 
+            }
+
+            // 2) potom nepriateæa
+            if (h.CompareTag("Enemy"))
+            {
+                EnemyHealth eh = h.GetComponent<EnemyHealth>();
+                if (eh != null)
+                    eh.TakeDamage(damage);
             }
         }
     }
