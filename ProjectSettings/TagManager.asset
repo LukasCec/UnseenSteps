@@ -19,8 +19,8 @@ TagManager:
   - Wall
   - Player
   - Enemy
-  - 
-  - 
+  - Draggable
+  - EnemyHitbox
   - 
   - 
   - 
