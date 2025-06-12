@@ -1,18 +1,18 @@
 using UnityEngine;
 
+[RequireComponent(typeof(BoxCollider2D))]
+[RequireComponent(typeof(Rigidbody2D))]
 public class EnemyAttackHitbox : MonoBehaviour
 {
     public int damage = 1;
 
-    private void OnTriggerEnter2D(Collider2D other)
+    void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
         {
-            PlayerHealth player = other.GetComponent<PlayerHealth>();
-            if (player != null)
-            {
-                player.TakeDamage(damage, transform.position);
-            }
+            Debug.Log("Hraca trafil");
+            other.GetComponent<PlayerHealth>()?.TakeDamage(damage, transform.position);
+            
         }
     }
 }

@@ -1,108 +1,83 @@
+// Enemy.cs
 using UnityEngine;
 using System.Collections;
 
-[RequireComponent(typeof(EnemyHealth))]
 [RequireComponent(typeof(EnemyWalk))]
 [RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(BoxCollider2D))]
 public class Enemy : MonoBehaviour
 {
     [Header("Attack Settings")]
     public float detectionRange = 1.5f;
     public float attackCooldown = 1f;
-    public GameObject attackHitbox;
 
-    private bool isAttacking;
+    [Header("Hitbox")]
+    public BoxCollider2D hitboxCollider;
+
+    private bool isAttacking = false;
     private bool canAttack = true;
 
-    // Komponenty
-    private EnemyHealth enemyHealth;  // star� sa o HP
-    private EnemyWalk enemyWalk;      // star� sa o pohyb + flip okraj/stena
-    private Rigidbody2D rb;
     private Animator animator;
+    private Rigidbody2D rb;
+    private EnemyWalk enemyWalk;
     private Transform player;
 
     void Awake()
     {
-        // Na��tame pripojen� komponenty
-        enemyHealth = GetComponent<EnemyHealth>();
-        enemyWalk = GetComponent<EnemyWalk>();
-        rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
-        player = GameObject.FindGameObjectWithTag("Player")?.transform;
+        rb = GetComponent<Rigidbody2D>();
+        enemyWalk = GetComponent<EnemyWalk>();
+        player = GameObject.FindWithTag("Player")?.transform;
 
-        if (attackHitbox != null)
-            attackHitbox.SetActive(false); // Prevent�vne vypneme
+        // ensure our trigger is off at start
+        hitboxCollider.enabled = false;
     }
 
     void FixedUpdate()
     {
-        // Ak zrovna �to��me, m��eme zablokova� movement
-        // (alebo ponecha�, ak chcete, aby nepriate� mohol chodi� aj po�as anim�cie �toku)
         if (isAttacking)
         {
+            // stop moving
             rb.linearVelocity = Vector2.zero;
+            animator.SetBool("isMoving", false);
             enemyWalk.enabled = false;
         }
         else
         {
+            // resume patrol and animate
             enemyWalk.enabled = true;
+            bool moving = Mathf.Abs(rb.linearVelocity.x) > 0.01f;
+            animator.SetBool("isMoving", moving);
         }
 
-        DetectPlayer();
+        TryDetectAndAttack();
     }
 
-    /// <summary> Kontrola, �i je hr�� v dosahu na �tok, a pr�padn� spustenie </summary>
-    void DetectPlayer()
+    private void TryDetectAndAttack()
     {
-        if (player == null) return;
+        if (!canAttack || player == null) return;
 
-        float distance = Vector2.Distance(transform.position, player.position);
-
-        if (distance <= detectionRange && canAttack)
+        if (Vector2.Distance(transform.position, player.position) <= detectionRange)
         {
             StartCoroutine(AttackRoutine());
         }
     }
 
-    /// <summary> Coroutine na spracovanie �toku </summary>
-    IEnumerator AttackRoutine()
+    private IEnumerator AttackRoutine()
     {
         isAttacking = true;
         canAttack = false;
+        enemyWalk.enabled = false;
 
-        // Spusti anim�ciu �toku
-        if (animator != null)
-            animator.SetTrigger("isAttacking");
+        animator.SetTrigger("Attack");
 
-        // Po�k�me cooldown
         yield return new WaitForSeconds(attackCooldown);
 
         isAttacking = false;
         canAttack = true;
     }
 
-    //  Tieto met�dy sp���aj�/zastavuj� hitbox - pripojen� na anim�ciu (Animation Event)
-    public void EnableAttackHitbox()
-    {
-        if (attackHitbox == null) return;
-        attackHitbox.SetActive(false);
-        attackHitbox.SetActive(true);
-
-        // M��ete tu priamo rie�i� damage hr��ovi (OverlapBox...), 
-        // alebo to necha� na skript v AttackHitbox
-    }
-
-    public void DisableAttackHitbox()
-    {
-        if (attackHitbox == null) return;
-        attackHitbox.SetActive(false);
-    }
-
-    // --- Pomocn� debug vizu�ly ---
-    void OnDrawGizmosSelected()
-    {
-        // �erven� guli�ka okolo nepriate�a nazna�uj�ca detectionRange
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, detectionRange);
-    }
+    // Called by Animation Events:
+    public void EnableHitbox() => hitboxCollider.enabled = true;
+    public void DisableHitbox() => hitboxCollider.enabled = false;
 }
