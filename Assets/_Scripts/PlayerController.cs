@@ -41,6 +41,15 @@ public class PlayerController : MonoBehaviour
     float wallStickCounter;
     float horizontal;
 
+
+    [Header("Dragging")]
+    [Tooltip("Layers containing dragable objects")]
+    public LayerMask dragableLayer;
+    public float dragRange = 1.5f;
+
+    private Dragable currentDrag;
+    private bool isDragging;
+
     [Header("Attack Settings")]
     public GameObject attackHitbox;
     private bool isAttacking;
@@ -51,16 +60,35 @@ public class PlayerController : MonoBehaviour
     public bool isStunned = false;
     public int damage = 1;
 
+    [Header("Ground + Draggable")]
+    [SerializeField] private LayerMask groundAndDragLayer;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         wallStickCounter = stickTime;
+        groundAndDragLayer = groundLayer | dragableLayer;
     }
 
     void Update()
     {
         horizontal = Input.GetAxisRaw("Horizontal");
+
+        if (isDragging)
+        {
+            // namiesto klasického Flipovania pod¾a vstupu
+            FaceDragable();
+
+            // ukonèenie ahania
+            if (Input.GetMouseButtonUp(1))
+                EndDrag();
+
+            // naozaj sa pohni (bez flipu pod¾a inputu)
+            rb.linearVelocity = new Vector2(horizontal * speed, rb.linearVelocity.y);
+            return;
+        }
+
         if (isStunned) return;
         if (DialogueManager.GetInstance().dialogueIsPlaying)
         {
@@ -88,6 +116,8 @@ public class PlayerController : MonoBehaviour
         {
             StartCoroutine(Dash());
         }
+        if (Input.GetMouseButtonDown(1))
+            TryStartDrag();
 
         WallSlideCheck();
         UpdateAnimator();
@@ -182,7 +212,7 @@ public class PlayerController : MonoBehaviour
 
     void CheckGround()
     {
-        RaycastHit2D hit = Physics2D.Raycast(groundCheck.position, Vector2.down, groundCheckDistance, groundLayer);
+        RaycastHit2D hit = Physics2D.Raycast(groundCheck.position, Vector2.down, groundCheckDistance, groundAndDragLayer);
 
         bool wasGrounded = isGrounded;
         isGrounded = hit.collider != null;
@@ -214,7 +244,7 @@ public class PlayerController : MonoBehaviour
     bool CanMoveInDirection(float dir)
     {
         Vector2 direction = dir > 0 ? Vector2.right : Vector2.left;
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, direction, movementCheckDistance, groundLayer);
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, direction, movementCheckDistance, groundAndDragLayer);
         return hit.collider == null;
     }
 
@@ -305,5 +335,48 @@ public class PlayerController : MonoBehaviour
         isStunned = false;
     }
 
+    private void TryStartDrag()
+    {
+        // Najprv nájdi najbližší collider v okruhu
+        Collider2D hit = Physics2D.OverlapCircle(transform.position, dragRange, dragableLayer);
+        if (hit == null) return;
+
+        Dragable dr = hit.GetComponent<Dragable>();
+        if (dr != null && dr.IsInRange(transform.position))
+        {
+            // Zistíme skutoèný bod dotyku na kolíderi
+            Vector2 worldAnchor = hit.ClosestPoint(transform.position);
+
+            // A pošleme ho do StartDrag
+            dr.StartDrag(rb, worldAnchor);
+
+            currentDrag = dr;
+            isDragging = true;
+        }
+    }
+    private void EndDrag()
+    {
+        if (currentDrag != null)
+        {
+            currentDrag.EndDrag();
+            currentDrag = null;
+        }
+        isDragging = false;
+    }
+
+    private void HandleMovementInputsOnly()
+    {
+        rb.linearVelocity = new Vector2(horizontal * speed, rb.linearVelocity.y);
+    }
+
+    private void FaceDragable()
+    {
+        if (currentDrag == null) return;
+        bool objectOnRight = currentDrag.transform.position.x > transform.position.x;
+        // ak je objekt napravo a ja sa nepozerám doprava, otoè ma
+        if (objectOnRight && !isFacingRight()) Flip();
+        // ak je objekt na¾avo a ja sa pozerám doprava, otoè ma
+        else if (!objectOnRight && isFacingRight()) Flip();
+    }
 
 }
