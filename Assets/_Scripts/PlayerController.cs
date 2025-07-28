@@ -77,14 +77,14 @@ public class PlayerController : MonoBehaviour
 
         if (isDragging)
         {
-            // namiesto klasickÈho Flipovania podæa vstupu
+            // namiesto klasickho Flipovania poda vstupu
             FaceDragable();
 
-            // ukonËenie ùahania
+            // ukonenie ahania
             if (Input.GetMouseButtonUp(1))
                 EndDrag();
 
-            // naozaj sa pohni (bez flipu podæa inputu)
+            // naozaj sa pohni (bez flipu poda inputu)
             rb.linearVelocity = new Vector2(horizontal * speed, rb.linearVelocity.y);
             return;
         }
@@ -175,7 +175,7 @@ public class PlayerController : MonoBehaviour
     {
         
         isDashing = true;
-        lastDashTime = Time.time; // tu sa spustÌ cooldown
+        lastDashTime = Time.time; // tu sa spust cooldown
         Instantiate(dashEffectPrefab, transform.position, Quaternion.identity);
 
         float originalGravity = rb.gravityScale;
@@ -293,31 +293,21 @@ public class PlayerController : MonoBehaviour
         attackHitbox.SetActive(false);
         attackHitbox.SetActive(true);
 
-        // zÌskame BoxCollider2D a prepoËÌtame pozÌciu do world space
+        // zskame BoxCollider2D a prepotame pozciu do world space
         BoxCollider2D col = attackHitbox.GetComponent<BoxCollider2D>();
         Vector2 worldPos = attackHitbox.transform.TransformPoint(col.offset);
         Vector2 size = col.size;
         float angle = attackHitbox.transform.eulerAngles.z;
 
-        // OBSAHOVO HºAD¡ME VäETKY objekty v hitboxe
+        // OBSAHOVO HADME VETKY objekty v hitboxe
         Collider2D[] hits = Physics2D.OverlapBoxAll(worldPos, size, angle);
 
         foreach (var h in hits)
         {
-            // 1) najprv sk˙siù rozbitn˝ objekt
-            Breakable br = h.GetComponent<Breakable>();
-            if (br != null)
+            IDamageable damageable = h.GetComponent<IDamageable>();
+            if (damageable != null)
             {
-                br.Hit();
-                continue; 
-            }
-
-            // 2) potom nepriateæa
-            if (h.CompareTag("Enemy"))
-            {
-                EnemyHealth eh = h.GetComponent<EnemyHealth>();
-                if (eh != null)
-                    eh.TakeDamage(damage);
+                damageable.TakeDamage(damage);
             }
         }
     }
@@ -337,17 +327,17 @@ public class PlayerController : MonoBehaviour
 
     private void TryStartDrag()
     {
-        // Najprv n·jdi najbliûöÌ collider v okruhu
+        // Najprv njdi najbli collider v okruhu
         Collider2D hit = Physics2D.OverlapCircle(transform.position, dragRange, dragableLayer);
         if (hit == null) return;
 
         Dragable dr = hit.GetComponent<Dragable>();
         if (dr != null && dr.IsInRange(transform.position))
         {
-            // ZistÌme skutoËn˝ bod dotyku na kolÌderi
+            // Zistme skuton bod dotyku na kolderi
             Vector2 worldAnchor = hit.ClosestPoint(transform.position);
 
-            // A poöleme ho do StartDrag
+            // A poleme ho do StartDrag
             dr.StartDrag(rb, worldAnchor);
 
             currentDrag = dr;
@@ -373,9 +363,9 @@ public class PlayerController : MonoBehaviour
     {
         if (currentDrag == null) return;
         bool objectOnRight = currentDrag.transform.position.x > transform.position.x;
-        // ak je objekt napravo a ja sa nepozer·m doprava, otoË ma
+        // ak je objekt napravo a ja sa nepozerm doprava, oto ma
         if (objectOnRight && !isFacingRight()) Flip();
-        // ak je objekt naæavo a ja sa pozer·m doprava, otoË ma
+        // ak je objekt naavo a ja sa pozerm doprava, oto ma
         else if (!objectOnRight && isFacingRight()) Flip();
     }
 

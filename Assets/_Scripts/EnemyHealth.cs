@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 
 [RequireComponent(typeof(SpriteRenderer))]
-public class EnemyHealth : MonoBehaviour
+public class EnemyHealth : MonoBehaviour, IDamageable
 {
     [Header("Health Settings")]
     public int maxHealth = 3;
@@ -34,10 +34,10 @@ public class EnemyHealth : MonoBehaviour
 
         for (int i = 0; i < blinkCount; i++)
         {
-            sr.color = new Color(1, 1, 1, 0.2f);  // trošku prieh¾adný
+            sr.color = new Color(1, 1, 1, 0.2f);  // troku priehadn
             yield return new WaitForSeconds(blinkDuration);
 
-            sr.color = Color.white;              // vrátime pôvodnú farbu
+            sr.color = Color.white;              // vrtime pvodn farbu
             yield return new WaitForSeconds(blinkDuration);
         }
     }
