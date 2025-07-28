@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 
 [RequireComponent(typeof(SpriteRenderer))]
-public class Breakable : MonoBehaviour
+public class Breakable : MonoBehaviour, IDamageable
 {
     [Header("Durability")]
     [SerializeField] private int strength = 3;
@@ -29,19 +29,19 @@ public class Breakable : MonoBehaviour
     }
 
     /// <summary>
-    /// Volajte, keï objekt zasiahne hráè.
+    /// Called when the object takes damage.
     /// </summary>
-    public void Hit()
+    public void TakeDamage(int dmg)
     {
-        currentStrength--;
+        currentStrength -= dmg;
 
         // 1) Blink efekt
         StartCoroutine(BlinkEffect());
 
-        // 2) Shake efekt – zaznamená si teraz aktuálnu pozíciu
+        // 2) Shake efekt  zaznamen si teraz aktulnu pozciu
         StartCoroutine(ShakeEffect());
 
-        // 3) Ak životnos vyèerpaná -> rozbi
+        // 3) Ak ivotnos vyerpan -> rozbi
         if (currentStrength <= 0)
             Break();
     }
@@ -59,7 +59,7 @@ public class Breakable : MonoBehaviour
 
     private IEnumerator ShakeEffect()
     {
-        // zaznamenáme si súèasnú svetovú pozíciu
+        // zaznamenme si sasn svetov pozciu
         Vector3 originalPos = transform.position;
         float elapsed = 0f;
 
@@ -73,7 +73,7 @@ public class Breakable : MonoBehaviour
             yield return null;
         }
 
-        // vrátime presne na tú istú pozíciu
+        // vrtime presne na t ist pozciu
         transform.position = originalPos;
     }
 
@@ -93,7 +93,7 @@ public class Breakable : MonoBehaviour
             );
         }
 
-        // Znièi samotný GameObject
+        // Znii samotn GameObject
         Destroy(gameObject);
     }
 }

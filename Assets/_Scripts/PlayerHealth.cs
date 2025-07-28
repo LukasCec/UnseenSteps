@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class PlayerHealth : MonoBehaviour
+public class PlayerHealth : MonoBehaviour, IDamageable
 {
     public int health = 5;
     private SpriteRenderer sr;
@@ -14,6 +14,12 @@ public class PlayerHealth : MonoBehaviour
     {
         sr = GetComponent<SpriteRenderer>(); // alebo z child objektu ak sprite nie je priamo na root
         controller = GetComponent<PlayerController>();
+    }
+
+    // Implementation for IDamageable
+    public void TakeDamage(int dmg)
+    {
+        TakeDamage(dmg, transform.position);
     }
 
     public void TakeDamage(int dmg, Vector2 attackerPosition)
