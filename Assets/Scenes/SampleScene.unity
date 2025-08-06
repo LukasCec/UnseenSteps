@@ -2337,7 +2337,7 @@ TilemapRenderer:
   m_SortOrder: 0
   m_Mode: 0
   m_DetectChunkCullingBounds: 0
-  m_MaskInteraction: 0
+  m_MaskInteraction: 1
 --- !u!1839735485 &948630893
 Tilemap:
   m_ObjectHideFlags: 0
@@ -4152,7 +4152,7 @@ TilemapRenderer:
   m_SortOrder: 0
   m_Mode: 0
   m_DetectChunkCullingBounds: 0
-  m_MaskInteraction: 0
+  m_MaskInteraction: 1
 --- !u!1839735485 &1441042038
 Tilemap:
   m_ObjectHideFlags: 0
@@ -8723,11 +8723,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8733799523556613707, guid: 4ac19551cc6bcf54e91e083a38be43ee, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 51.58
+      value: 39.43
       objectReference: {fileID: 0}
     - target: {fileID: 8733799523556613707, guid: 4ac19551cc6bcf54e91e083a38be43ee, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -4.53
+      value: -5.29
       objectReference: {fileID: 0}
     - target: {fileID: 8733799523556613707, guid: 4ac19551cc6bcf54e91e083a38be43ee, type: 3}
       propertyPath: m_LocalPosition.z
@@ -17096,11 +17096,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5786032299241951369, guid: 85f10cd069e41464f8ae4a5593c345f1, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 60.62
+      value: -43.8
       objectReference: {fileID: 0}
     - target: {fileID: 5786032299241951369, guid: 85f10cd069e41464f8ae4a5593c345f1, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -6.61
+      value: -3.55
       objectReference: {fileID: 0}
     - target: {fileID: 5786032299241951369, guid: 85f10cd069e41464f8ae4a5593c345f1, type: 3}
       propertyPath: m_LocalPosition.z

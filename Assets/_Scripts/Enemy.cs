@@ -29,7 +29,7 @@ public class Enemy : MonoBehaviour
         enemyWalk = GetComponent<EnemyWalk>();
         player = GameObject.FindWithTag("Player")?.transform;
 
-        // ensure our trigger is off at start
+        
         hitboxCollider.enabled = false;
     }
 
@@ -37,14 +37,14 @@ public class Enemy : MonoBehaviour
     {
         if (isAttacking)
         {
-            // stop moving
+            
             rb.linearVelocity = Vector2.zero;
             animator.SetBool("isMoving", false);
             enemyWalk.enabled = false;
         }
         else
         {
-            // resume patrol and animate
+           
             enemyWalk.enabled = true;
             bool moving = Mathf.Abs(rb.linearVelocity.x) > 0.01f;
             animator.SetBool("isMoving", moving);
@@ -77,7 +77,7 @@ public class Enemy : MonoBehaviour
         canAttack = true;
     }
 
-    // Called by Animation Events:
+    
     public void EnableHitbox() => hitboxCollider.enabled = true;
     public void DisableHitbox() => hitboxCollider.enabled = false;
 }
