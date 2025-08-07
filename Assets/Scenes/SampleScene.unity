@@ -533,6 +533,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!61 &155504207 stripped
+BoxCollider2D:
+  m_CorrespondingSourceObject: {fileID: 1154478670814103252, guid: 92262467000ef5045b4f443f0b5dab81, type: 3}
+  m_PrefabInstance: {fileID: 1469647816}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &184079781
 GameObject:
   m_ObjectHideFlags: 0
@@ -2089,6 +2094,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 30e8f017a6fa0984381a8554ffd253a0, type: 3}
+--- !u!61 &757194133 stripped
+BoxCollider2D:
+  m_CorrespondingSourceObject: {fileID: 1154478670814103252, guid: 92262467000ef5045b4f443f0b5dab81, type: 3}
+  m_PrefabInstance: {fileID: 1910769869}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &815209927 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5460205173843558891, guid: 92262467000ef5045b4f443f0b5dab81, type: 3}
@@ -2321,6 +2331,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: EnemyNinja (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 4229782410137462912, guid: 92262467000ef5045b4f443f0b5dab81, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5460205173843558891, guid: 92262467000ef5045b4f443f0b5dab81, type: 3}
       propertyPath: m_LocalPosition.x
       value: -97.55067
@@ -2361,7 +2375,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1940174205052651649, guid: 92262467000ef5045b4f443f0b5dab81, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -10274,6 +10289,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 778722823339128431, guid: 92262467000ef5045b4f443f0b5dab81, type: 3}
+      propertyPath: hitboxCollider
+      value: 
+      objectReference: {fileID: 155504207}
     - target: {fileID: 3698002109502231032, guid: 92262467000ef5045b4f443f0b5dab81, type: 3}
       propertyPath: m_Name
       value: EnemyNinja
@@ -10281,6 +10300,10 @@ PrefabInstance:
     - target: {fileID: 4229782410137462912, guid: 92262467000ef5045b4f443f0b5dab81, type: 3}
       propertyPath: m_Layer
       value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 4229782410137462912, guid: 92262467000ef5045b4f443f0b5dab81, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5460205173843558891, guid: 92262467000ef5045b4f443f0b5dab81, type: 3}
       propertyPath: m_LocalPosition.x
@@ -18430,9 +18453,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2052640530}
     m_Modifications:
+    - target: {fileID: 778722823339128431, guid: 92262467000ef5045b4f443f0b5dab81, type: 3}
+      propertyPath: hitboxCollider
+      value: 
+      objectReference: {fileID: 757194133}
     - target: {fileID: 3698002109502231032, guid: 92262467000ef5045b4f443f0b5dab81, type: 3}
       propertyPath: m_Name
       value: EnemyNinja (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4229782410137462912, guid: 92262467000ef5045b4f443f0b5dab81, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5460205173843558891, guid: 92262467000ef5045b4f443f0b5dab81, type: 3}
       propertyPath: m_LocalPosition.x
