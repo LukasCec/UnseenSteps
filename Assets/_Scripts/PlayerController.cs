@@ -11,6 +11,11 @@ public class PlayerController : MonoBehaviour
     public float speed = 8f;
     public float jumpForce = 15f;
 
+    [Header("Double Jump")]
+    public int maxJumpCount = 2;
+    public int currentJumpCount;
+    private Coroutine jumpResetCoroutine;
+
     [Header("Dash")]
     public float dashSpeed = 25f;
     public float dashDuration = 0.2f;
@@ -77,14 +82,13 @@ public class PlayerController : MonoBehaviour
 
         if (isDragging)
         {
-            // namiesto klasickho Flipovania poda vstupu
+           
             FaceDragable();
 
-            // ukonenie ahania
+           
             if (Input.GetMouseButtonUp(1))
                 EndDrag();
 
-            // naozaj sa pohni (bez flipu poda inputu)
             rb.linearVelocity = new Vector2(horizontal * speed, rb.linearVelocity.y);
             return;
         }
@@ -100,11 +104,16 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            if (isGrounded)
-                Jump();
-            else if (isWallSliding || isTouchingWall)
+            if (isWallSliding || isTouchingWall)
+            {
                 StartCoroutine(WallJump());
+            }
+            else if (currentJumpCount > 0)
+            {
+                Jump();
+            }
         }
+
 
         if (Input.GetMouseButtonDown(0) && !isAttacking && isGrounded)
         {
@@ -157,6 +166,7 @@ public class PlayerController : MonoBehaviour
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
         Vector3 spawnPos = groundCheck.position;
         Instantiate(jumpEffectPrefab, spawnPos, Quaternion.identity);
+        currentJumpCount--; 
     }
 
     IEnumerator WallJump()
@@ -217,14 +227,19 @@ public class PlayerController : MonoBehaviour
         bool wasGrounded = isGrounded;
         isGrounded = hit.collider != null;
 
-        //  Detekuj dopad (bol vo vzduchu ->eraz je na zemi)
+        // Skutoèný dopad: z vo vzduchu -> na zem
         if (!wasGrounded && isGrounded)
         {
             SpawnLandingEffect();
+
+            if (jumpResetCoroutine != null)
+                StopCoroutine(jumpResetCoroutine);
+            jumpResetCoroutine = StartCoroutine(ResetJumpCountAfterDelay(0.05f));
         }
 
         wasGroundedLastFrame = isGrounded;
     }
+
 
     void SpawnLandingEffect()
     {
@@ -367,6 +382,12 @@ public class PlayerController : MonoBehaviour
         if (objectOnRight && !isFacingRight()) Flip();
         // ak je objekt naavo a ja sa pozerm doprava, oto ma
         else if (!objectOnRight && isFacingRight()) Flip();
+    }
+
+    private IEnumerator ResetJumpCountAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        currentJumpCount = maxJumpCount;
     }
 
 }
