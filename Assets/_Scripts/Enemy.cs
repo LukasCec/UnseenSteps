@@ -77,7 +77,22 @@ public class Enemy : MonoBehaviour
         canAttack = true;
     }
 
-    
-    public void EnableHitbox() => hitboxCollider.enabled = true;
-    public void DisableHitbox() => hitboxCollider.enabled = false;
+
+    public void EnableHitbox()
+    {
+        if (hitboxCollider != null)
+        {
+            hitboxCollider.enabled = true;
+            Debug.Log("Hitbox ENABLED");
+        }
+    }
+
+    public void DisableHitbox()
+    {
+        if (hitboxCollider != null)
+        {
+            hitboxCollider.enabled = false;
+            Debug.Log("Hitbox DISABLED");
+        }
+    }
 }

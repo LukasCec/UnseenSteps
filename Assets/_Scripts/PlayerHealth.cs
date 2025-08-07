@@ -12,11 +12,11 @@ public class PlayerHealth : MonoBehaviour, IDamageable
 
     void Start()
     {
-        sr = GetComponent<SpriteRenderer>(); // alebo z child objektu ak sprite nie je priamo na root
+        sr = GetComponent<SpriteRenderer>(); 
         controller = GetComponent<PlayerController>();
     }
 
-    // Implementation for IDamageable
+   
     public void TakeDamage(int dmg)
     {
         TakeDamage(dmg, transform.position);
@@ -30,7 +30,7 @@ public class PlayerHealth : MonoBehaviour, IDamageable
         controller.StartCoroutine(controller.Stun(0.2f));
         
 
-        GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero; // reset r�chlosti
+        GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero; 
         GetComponent<Rigidbody2D>().AddForce(knockDirection * knockbackForce, ForceMode2D.Impulse);
         StartCoroutine(BlinkEffect());
         if (health <= 0)
@@ -49,9 +49,9 @@ public class PlayerHealth : MonoBehaviour, IDamageable
 
         for (int i = 0; i < blinkCount; i++)
         {
-            sr.color = new Color(1, 1, 1, 0.2f); // prieh�adn�
+            sr.color = new Color(1, 1, 1, 0.2f); 
             yield return new WaitForSeconds(blinkDuration);
-            sr.color = Color.white; // sp� na norm�l
+            sr.color = Color.white; 
             yield return new WaitForSeconds(blinkDuration);
         }
     }
