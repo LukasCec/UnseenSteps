@@ -107,16 +107,20 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            if ((isWallSliding || isTouchingWall))
+            if ((isWallSliding || isTouchingWall) && abilitiesData.canWallJump)
             {
                 StartCoroutine(WallJump());
             }
-            else if (currentJumpCount > 0)
+            else if (isGrounded)
+            {
+               
+                Jump();
+            }
+            else if (currentJumpCount > 0 && abilitiesData.canDoubleJump)
             {
                 Jump();
             }
         }
-
 
         if (Input.GetMouseButtonDown(0) && !isAttacking && isGrounded)
         {
