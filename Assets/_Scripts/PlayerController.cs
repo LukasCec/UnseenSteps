@@ -68,6 +68,9 @@ public class PlayerController : MonoBehaviour
     [Header("Ground + Draggable")]
     [SerializeField] private LayerMask groundAndDragLayer;
 
+    [Header("Player Abilities Data")]
+    public PlayerAbilitiesData abilitiesData;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -104,7 +107,7 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            if (isWallSliding || isTouchingWall)
+            if ((isWallSliding || isTouchingWall))
             {
                 StartCoroutine(WallJump());
             }
@@ -121,7 +124,7 @@ public class PlayerController : MonoBehaviour
             animator.SetTrigger(AnimationStrings.Attack);
         }
 
-        if (Input.GetKeyDown(KeyCode.LeftShift) && !isDashing && Time.time - lastDashTime >= dashCooldown)
+        if (Input.GetKeyDown(KeyCode.LeftShift) && abilitiesData.canDash && !isDashing && Time.time - lastDashTime >= dashCooldown)
         {
             StartCoroutine(Dash());
         }
@@ -200,6 +203,8 @@ public class PlayerController : MonoBehaviour
 
     void WallSlideCheck()
     {
+        if (!abilitiesData.canWallSlide) return;
+
         if (isTouchingWall && !isGrounded && horizontal != 0 && canWallStick)
         {
             if (wallStickCounter > 0)
