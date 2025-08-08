@@ -2495,7 +2495,7 @@ TilemapRenderer:
   m_SortOrder: 0
   m_Mode: 0
   m_DetectChunkCullingBounds: 0
-  m_MaskInteraction: 2
+  m_MaskInteraction: 1
 --- !u!1839735485 &948630893
 Tilemap:
   m_ObjectHideFlags: 0
@@ -4376,7 +4376,7 @@ TilemapRenderer:
   m_SortOrder: 0
   m_Mode: 0
   m_DetectChunkCullingBounds: 0
-  m_MaskInteraction: 2
+  m_MaskInteraction: 1
 --- !u!1839735485 &1441042038
 Tilemap:
   m_ObjectHideFlags: 0
@@ -11296,7 +11296,7 @@ TilemapRenderer:
   m_SortOrder: 0
   m_Mode: 0
   m_DetectChunkCullingBounds: 0
-  m_MaskInteraction: 2
+  m_MaskInteraction: 1
 --- !u!1839735485 &1808608424
 Tilemap:
   m_ObjectHideFlags: 0
@@ -18921,6 +18921,22 @@ PrefabInstance:
       propertyPath: groundAndDragLayer.m_Bits
       value: 1088
       objectReference: {fileID: 0}
+    - target: {fileID: 3170961867145933232, guid: 85f10cd069e41464f8ae4a5593c345f1, type: 3}
+      propertyPath: owner
+      value: 
+      objectReference: {fileID: 96500566}
+    - target: {fileID: 3170961867145933232, guid: 85f10cd069e41464f8ae4a5593c345f1, type: 3}
+      propertyPath: ownerRoot
+      value: 
+      objectReference: {fileID: 96500566}
+    - target: {fileID: 3170961867145933232, guid: 85f10cd069e41464f8ae4a5593c345f1, type: 3}
+      propertyPath: targetLayers.m_Bits
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5000327538629097129, guid: 85f10cd069e41464f8ae4a5593c345f1, type: 3}
+      propertyPath: m_TagString
+      value: Player
+      objectReference: {fileID: 0}
     - target: {fileID: 5786032299241951369, guid: 85f10cd069e41464f8ae4a5593c345f1, type: 3}
       propertyPath: m_LocalPosition.x
       value: -101.5
@@ -18969,9 +18985,17 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6095939309536450333, guid: 85f10cd069e41464f8ae4a5593c345f1, type: 3}
+      propertyPath: m_TagString
+      value: Player
+      objectReference: {fileID: 0}
     - target: {fileID: 8028199543541507529, guid: 85f10cd069e41464f8ae4a5593c345f1, type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8028199543541507529, guid: 85f10cd069e41464f8ae4a5593c345f1, type: 3}
+      propertyPath: m_TagString
+      value: Player
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

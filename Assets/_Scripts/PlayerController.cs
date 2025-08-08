@@ -329,7 +329,7 @@ public class PlayerController : MonoBehaviour
         foreach (var h in hits)
         {
             IDamageable damageable = h.GetComponent<IDamageable>();
-            if (damageable != null)
+            if (damageable != null && h.transform.root != transform.root)
             {
                 damageable.TakeDamage(damage);
             }
