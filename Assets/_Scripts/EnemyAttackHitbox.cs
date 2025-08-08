@@ -4,15 +4,21 @@ using UnityEngine;
 public class EnemyAttackHitbox : MonoBehaviour
 {
     public int damage = 1;
-    // optional: leave empty to not rely on tags
     public string targetTag = "Player";
 
     private bool canDealDamage;
 
-    void OnEnable()
+   
+    public void BeginWindow()
     {
-        canDealDamage = true; // one hit per activation window
-        Debug.Log("Hitbox ENABLED");
+        canDealDamage = true;
+        Debug.Log("Hitbox window begin");
+    }
+
+    public void EndWindow()
+    {
+        canDealDamage = false;
+        Debug.Log("Hitbox window end");
     }
 
     void OnTriggerEnter2D(Collider2D other) => TryHit(other);
@@ -21,11 +27,8 @@ public class EnemyAttackHitbox : MonoBehaviour
     private void TryHit(Collider2D other)
     {
         if (!canDealDamage) return;
+        if (!string.IsNullOrEmpty(targetTag) && !other.CompareTag(targetTag)) return;
 
-        if (!string.IsNullOrEmpty(targetTag) && !other.CompareTag(targetTag))
-            return;
-
-        // find PlayerHealth anywhere on the contacted object
         var ph = other.GetComponent<PlayerHealth>()
                  ?? other.GetComponentInParent<PlayerHealth>()
                  ?? other.GetComponentInChildren<PlayerHealth>();

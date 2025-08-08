@@ -82,6 +82,10 @@ public class Enemy : MonoBehaviour
     {
         if (hitboxCollider != null)
         {
+            
+            var dealer = hitboxCollider.GetComponent<EnemyAttackHitbox>();
+            if (dealer != null) dealer.BeginWindow();
+
             hitboxCollider.enabled = true;
             Debug.Log("Hitbox ENABLED");
         }
@@ -91,6 +95,10 @@ public class Enemy : MonoBehaviour
     {
         if (hitboxCollider != null)
         {
+            
+            var dealer = hitboxCollider.GetComponent<EnemyAttackHitbox>();
+            if (dealer != null) dealer.EndWindow();
+
             hitboxCollider.enabled = false;
             Debug.Log("Hitbox DISABLED");
         }

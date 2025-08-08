@@ -2332,6 +2332,10 @@ PrefabInstance:
       value: EnemyNinja (2)
       objectReference: {fileID: 0}
     - target: {fileID: 4229782410137462912, guid: 92262467000ef5045b4f443f0b5dab81, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4229782410137462912, guid: 92262467000ef5045b4f443f0b5dab81, type: 3}
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
@@ -18921,6 +18925,10 @@ PrefabInstance:
     - target: {fileID: 6084385610625274909, guid: 85f10cd069e41464f8ae4a5593c345f1, type: 3}
       propertyPath: m_Name
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 6084385610625274909, guid: 85f10cd069e41464f8ae4a5593c345f1, type: 3}
+      propertyPath: m_Layer
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8028199543541507529, guid: 85f10cd069e41464f8ae4a5593c345f1, type: 3}
       propertyPath: m_IsActive
