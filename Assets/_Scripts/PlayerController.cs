@@ -81,14 +81,18 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            ResetScene();
+        }
         horizontal = Input.GetAxisRaw("Horizontal");
 
         if (isDragging)
         {
-           
+
             FaceDragable();
 
-           
+
             if (Input.GetMouseButtonUp(1))
                 EndDrag();
 
@@ -113,7 +117,7 @@ public class PlayerController : MonoBehaviour
             }
             else if (isGrounded)
             {
-               
+
                 Jump();
             }
             else if (currentJumpCount > 0 && abilitiesData.canDoubleJump)
@@ -138,7 +142,13 @@ public class PlayerController : MonoBehaviour
         WallSlideCheck();
         UpdateAnimator();
     }
+    void ResetScene()
+    {
+        UnityEngine.SceneManagement.Scene currentScene =
+            UnityEngine.SceneManagement.SceneManager.GetActiveScene();
 
+        UnityEngine.SceneManagement.SceneManager.LoadScene(currentScene.name);
+    }
     void FixedUpdate()
     {
         if (isDashing) return;
@@ -173,7 +183,7 @@ public class PlayerController : MonoBehaviour
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
         Vector3 spawnPos = groundCheck.position;
         Instantiate(jumpEffectPrefab, spawnPos, Quaternion.identity);
-        currentJumpCount--; 
+        currentJumpCount--;
     }
 
     IEnumerator WallJump()
@@ -190,7 +200,7 @@ public class PlayerController : MonoBehaviour
 
     IEnumerator Dash()
     {
-        
+
         isDashing = true;
         lastDashTime = Time.time; // tu sa spust cooldown
         Instantiate(dashEffectPrefab, transform.position, Quaternion.identity);
