@@ -1421,7 +1421,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 10
   m_TargetDisplay: 0
 --- !u!1 &519420028
 GameObject:
@@ -4520,8 +4520,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1411255516}
   - {fileID: 515560560}
+  - {fileID: 1411255516}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1256537737 stripped
@@ -4610,7 +4610,7 @@ RectTransform:
   m_GameObject: {fileID: 1346127157}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2.146816, y: 2.146816, z: 2.146816}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1011478931}
