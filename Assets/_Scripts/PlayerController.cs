@@ -161,7 +161,7 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, -wallSlideSpeed);
+            rb.linearVelocity = new Vector2(0f, -wallSlideSpeed);
         }
 
         CheckGround();
@@ -236,7 +236,7 @@ public class PlayerController : MonoBehaviour
         bool wasGrounded = isGrounded;
         isGrounded = hit.collider != null;
 
-        // Skutoèný dopad: z vo vzduchu -> na zem
+        // Skutoï¿½nï¿½ dopad: z vo vzduchu -> na zem
         if (!wasGrounded && isGrounded)
         {
             SpawnLandingEffect();
