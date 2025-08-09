@@ -203,7 +203,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e7b278dc18097146a5ef2ebd6c243ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  detectionRange: 0.49
+  detectionRange: 0.78
   attackCooldown: 1.5
   hitboxCollider: {fileID: 1154478670814103252}
 --- !u!114 &4410558816090967043

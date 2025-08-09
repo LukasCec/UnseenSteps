@@ -20506,9 +20506,21 @@ PrefabInstance:
     m_TransformParent: {fileID: 2052640530}
     m_Modifications:
     - target: {fileID: 2570497154919352675, guid: 85f10cd069e41464f8ae4a5593c345f1, type: 3}
+      propertyPath: healText
+      value: 
+      objectReference: {fileID: 1651803351}
+    - target: {fileID: 2570497154919352675, guid: 85f10cd069e41464f8ae4a5593c345f1, type: 3}
+      propertyPath: coinsText
+      value: 
+      objectReference: {fileID: 1648329504}
+    - target: {fileID: 2570497154919352675, guid: 85f10cd069e41464f8ae4a5593c345f1, type: 3}
       propertyPath: dragRange
       value: 1.1
       objectReference: {fileID: 0}
+    - target: {fileID: 2570497154919352675, guid: 85f10cd069e41464f8ae4a5593c345f1, type: 3}
+      propertyPath: revealText
+      value: 
+      objectReference: {fileID: 715448985}
     - target: {fileID: 2570497154919352675, guid: 85f10cd069e41464f8ae4a5593c345f1, type: 3}
       propertyPath: revealCircle
       value: 
