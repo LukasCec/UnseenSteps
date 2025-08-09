@@ -4730,9 +4730,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 008784ec6f92bfe4cb6a121cfb4542d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemType: 0
+  itemType: 1
   amount: 1
   inventoryData: {fileID: 11400000, guid: d0228b304b1f70d4ab362803a4034233, type: 2}
+  healText: {fileID: 1651803351}
+  revealText: {fileID: 715448985}
+  coinsText: {fileID: 1648329504}
   pickupEffectPrefab: {fileID: 0}
 --- !u!1 &1346127157
 GameObject:
@@ -11395,6 +11398,9 @@ MonoBehaviour:
   itemType: 0
   amount: 1
   inventoryData: {fileID: 11400000, guid: d0228b304b1f70d4ab362803a4034233, type: 2}
+  healText: {fileID: 1651803351}
+  revealText: {fileID: 715448985}
+  coinsText: {fileID: 1648329504}
   pickupEffectPrefab: {fileID: 0}
 --- !u!61 &1476768361
 BoxCollider2D:
