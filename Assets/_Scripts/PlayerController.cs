@@ -127,6 +127,11 @@ public class PlayerController : MonoBehaviour
             UseHealthPotion();
         }
         horizontal = Input.GetAxisRaw("Horizontal");
+        if (isAttacking)
+        {
+            horizontal = 0f;
+            return; 
+        }
 
         if (isDragging)
         {
@@ -192,12 +197,18 @@ public class PlayerController : MonoBehaviour
     }
     void FixedUpdate()
     {
+        if (isAttacking)
+        {
+            rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+            return;
+        }
         if (isDashing) return;
 
         if (DialogueManager.GetInstance().dialogueIsPlaying)
         {
             return;
         }
+
         if (!isWallSliding)
         {
             if ((horizontal > 0 && !CanMoveInDirection(1)) || (horizontal < 0 && !CanMoveInDirection(-1)))
