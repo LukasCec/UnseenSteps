@@ -79,6 +79,11 @@ public class PlayerController : MonoBehaviour
     public KeyCode revealPotionKey = KeyCode.Q; 
     private Coroutine fullRevealCo;
 
+    [Header("Health Potion")]
+    public KeyCode healthPotionKey = KeyCode.E;
+    public int healAmount = 2;                 // koľko HP doplní jeden potion
+    private PlayerHealth playerHealth;
+
     [Header("Inventory")]
     public InventoryData inventoryData; // Drag your InventoryData asset here
     public string potionItemID = "RevealPotion"; // optional: use ID if your InventoryData is ID-based
@@ -92,6 +97,7 @@ public class PlayerController : MonoBehaviour
         animator = GetComponent<Animator>();
         wallStickCounter = stickTime;
         groundAndDragLayer = groundLayer | dragableLayer;
+        playerHealth = GetComponent<PlayerHealth>();
     }
 
     void Update()
@@ -107,6 +113,11 @@ public class PlayerController : MonoBehaviour
                 UseRevealPotion();
             }
             
+        }
+
+        if (Input.GetKeyDown(healthPotionKey))
+        {
+            UseHealthPotion();
         }
         horizontal = Input.GetAxisRaw("Horizontal");
 
@@ -420,9 +431,9 @@ public class PlayerController : MonoBehaviour
     {
         if (currentDrag == null) return;
         bool objectOnRight = currentDrag.transform.position.x > transform.position.x;
-        // ak je objekt napravo a ja sa nepozerm doprava, oto ma
+      
         if (objectOnRight && !isFacingRight()) Flip();
-        // ak je objekt naavo a ja sa pozerm doprava, oto ma
+       
         else if (!objectOnRight && isFacingRight()) Flip();
     }
 
@@ -431,7 +442,7 @@ public class PlayerController : MonoBehaviour
         yield return new WaitForSeconds(delay);
         currentJumpCount = maxJumpCount;
     }
-    // ⬇️ Add these methods anywhere in the class
+   
 public void UseRevealPotion()
 {
     if (revealCircle == null || inventoryData == null) return;
@@ -439,10 +450,25 @@ public void UseRevealPotion()
     {
         return;
     }
-    inventoryData.revealPotions--;
-    if (fullRevealCo != null) StopCoroutine(fullRevealCo);
+        if (!inventoryData.UseRevealPotion()) return;
+        if (fullRevealCo != null) StopCoroutine(fullRevealCo);
     fullRevealCo = StartCoroutine(FullRevealRoutine());
 }
+
+    public void UseHealthPotion()
+    {
+        if (inventoryData == null || playerHealth == null) return;
+
+        
+        if (playerHealth.health >= playerHealth.maxHealth) return;
+
+        if (inventoryData.UseHealPotion())
+        {
+            playerHealth.Heal(healAmount); 
+                                          
+        }
+        
+    }
 
 
     private IEnumerator FullRevealRoutine()

@@ -3158,7 +3158,7 @@ TilemapRenderer:
   m_SortOrder: 0
   m_Mode: 0
   m_DetectChunkCullingBounds: 0
-  m_MaskInteraction: 1
+  m_MaskInteraction: 0
 --- !u!1839735485 &948630893
 Tilemap:
   m_ObjectHideFlags: 0
@@ -4573,7 +4573,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c504d03b0f82a6d46a2c1e523cc56e60, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Show: 1
+  Show: 0
   targetObjects:
   - {fileID: 1441042034}
   - {fileID: 948630889}
@@ -5373,7 +5373,7 @@ TilemapRenderer:
   m_SortOrder: 0
   m_Mode: 0
   m_DetectChunkCullingBounds: 0
-  m_MaskInteraction: 1
+  m_MaskInteraction: 0
 --- !u!1839735485 &1441042038
 Tilemap:
   m_ObjectHideFlags: 0
@@ -12870,7 +12870,7 @@ TilemapRenderer:
   m_SortOrder: 0
   m_Mode: 0
   m_DetectChunkCullingBounds: 0
-  m_MaskInteraction: 1
+  m_MaskInteraction: 0
 --- !u!1839735485 &1808608424
 Tilemap:
   m_ObjectHideFlags: 0
