@@ -3158,7 +3158,7 @@ TilemapRenderer:
   m_SortOrder: 0
   m_Mode: 0
   m_DetectChunkCullingBounds: 0
-  m_MaskInteraction: 0
+  m_MaskInteraction: 1
 --- !u!1839735485 &948630893
 Tilemap:
   m_ObjectHideFlags: 0
@@ -4573,7 +4573,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c504d03b0f82a6d46a2c1e523cc56e60, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Show: 0
+  Show: 1
   targetObjects:
   - {fileID: 1441042034}
   - {fileID: 948630889}
@@ -4596,7 +4596,7 @@ GameObject:
   - component: {fileID: 1342408574}
   - component: {fileID: 1342408577}
   m_Layer: 0
-  m_Name: Square
+  m_Name: RevealPotion
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4730,7 +4730,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 008784ec6f92bfe4cb6a121cfb4542d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemType: 0
+  itemType: 1
   amount: 1
   inventoryData: {fileID: 11400000, guid: d0228b304b1f70d4ab362803a4034233, type: 2}
   pickupEffectPrefab: {fileID: 0}
@@ -5370,7 +5370,7 @@ TilemapRenderer:
   m_SortOrder: 0
   m_Mode: 0
   m_DetectChunkCullingBounds: 0
-  m_MaskInteraction: 0
+  m_MaskInteraction: 1
 --- !u!1839735485 &1441042038
 Tilemap:
   m_ObjectHideFlags: 0
@@ -12713,7 +12713,7 @@ TilemapRenderer:
   m_SortOrder: 0
   m_Mode: 0
   m_DetectChunkCullingBounds: 0
-  m_MaskInteraction: 0
+  m_MaskInteraction: 1
 --- !u!1839735485 &1808608424
 Tilemap:
   m_ObjectHideFlags: 0
@@ -20215,6 +20215,17 @@ RectTransform:
   m_AnchoredPosition: {x: -57.8, y: -89}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &2101240906 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 624799305723474637, guid: d882463bc6390d64da0fe74f66b4a3e0, type: 3}
+  m_PrefabInstance: {fileID: 549160106}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ec58a31665814b4987b6a37cb570a93, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1340091013793900954
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -20341,6 +20352,10 @@ PrefabInstance:
       propertyPath: dragRange
       value: 1.1
       objectReference: {fileID: 0}
+    - target: {fileID: 2570497154919352675, guid: 85f10cd069e41464f8ae4a5593c345f1, type: 3}
+      propertyPath: revealCircle
+      value: 
+      objectReference: {fileID: 2101240906}
     - target: {fileID: 2570497154919352675, guid: 85f10cd069e41464f8ae4a5593c345f1, type: 3}
       propertyPath: dragableLayer.m_Bits
       value: 1024

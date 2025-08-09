@@ -71,6 +71,15 @@ public class PlayerController : MonoBehaviour
     [Header("Player Abilities Data")]
     public PlayerAbilitiesData abilitiesData;
 
+    [Header("Reveal Potion")]
+    public CursorRevealCircle revealCircle;   
+    public float fullRevealDuration = 5f;   
+    public float fullRevealRadius = 4000f;    
+    public KeyCode revealPotionKey = KeyCode.Q; 
+    private Coroutine fullRevealCo;
+
+
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -84,6 +93,10 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.R))
         {
             ResetScene();
+        }
+        if (Input.GetKeyDown(revealPotionKey))
+        {
+            UseRevealPotion();
         }
         horizontal = Input.GetAxisRaw("Horizontal");
 
@@ -408,5 +421,51 @@ public class PlayerController : MonoBehaviour
         yield return new WaitForSeconds(delay);
         currentJumpCount = maxJumpCount;
     }
+    // ⬇️ Add these methods anywhere in the class
+public void UseRevealPotion()
+{
+    if (revealCircle == null) return;
+    if (fullRevealCo != null) StopCoroutine(fullRevealCo);   
+    fullRevealCo = StartCoroutine(FullRevealRoutine());
+}
+
+private IEnumerator FullRevealRoutine()
+{
+    float originalRadius = revealCircle.revealRadius;
+    float targetRadius = fullRevealRadius;
+
+    float growTime = 1f; // seconds to grow to full size
+    float timer = 0f;
+
+    // Smoothly grow the radius
+    while (timer < growTime)
+    {
+        timer += Time.deltaTime;
+        float t = timer / growTime;
+        revealCircle.revealRadius = Mathf.Lerp(originalRadius, targetRadius, t);
+        yield return null;
+    }
+
+    // Hold at full size for the remaining time
+    yield return new WaitForSeconds(fullRevealDuration - growTime);
+
+    // Smoothly shrink back to original
+    timer = 0f;
+    while (timer < growTime)
+    {
+        timer += Time.deltaTime;
+        float t = timer / growTime;
+        revealCircle.revealRadius = Mathf.Lerp(targetRadius, originalRadius, t);
+        yield return null;
+    }
+
+    // Ensure exact original radius at the end
+    revealCircle.revealRadius = originalRadius;
+
+    fullRevealCo = null;
+}
+
+
 
 }
+
