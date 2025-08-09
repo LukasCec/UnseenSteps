@@ -1,4 +1,5 @@
 using UnityEngine;
+using TMPro;
 
 public class CollectibleItem : MonoBehaviour
 {
@@ -14,10 +15,20 @@ public class CollectibleItem : MonoBehaviour
     public int amount = 1;
 
     [Header("Inventory Reference")]
-    public InventoryData inventoryData; 
+    public InventoryData inventoryData;
+
+    [Header("UI References (TMP Texts)")]
+    public TMP_Text healText;
+    public TMP_Text revealText;
+    public TMP_Text coinsText;
 
     [Header("Pickup Effect")]
-    public GameObject pickupEffectPrefab; 
+    public GameObject pickupEffectPrefab;
+
+    private void Awake()
+    {
+        UpdateUI(); 
+    }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
@@ -29,7 +40,6 @@ public class CollectibleItem : MonoBehaviour
 
     void Collect()
     {
-       
         switch (itemType)
         {
             case ItemType.HealPotion:
@@ -45,12 +55,25 @@ public class CollectibleItem : MonoBehaviour
                 break;
         }
 
+        UpdateUI();
+
         if (pickupEffectPrefab != null)
         {
             Instantiate(pickupEffectPrefab, transform.position, Quaternion.identity);
         }
 
-        
         Destroy(gameObject);
+    }
+
+    void UpdateUI()
+    {
+        if (healText != null)
+            healText.text = $"{inventoryData.healPotions}";
+
+        if (revealText != null)
+            revealText.text = $"{inventoryData.revealPotions}";
+
+        if (coinsText != null)
+            coinsText.text = inventoryData.coins.ToString();
     }
 }
