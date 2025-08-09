@@ -23,36 +23,6 @@ public class InventoryData : ScriptableObject
         coins = Mathf.Max(0, coins + amount);
     }
 
-    public bool UseHealPotion()
-    {
-        if (healPotions > 0)
-        {
-            healPotions--;
-            return true;
-        }
-        return false;
-    }
-
-    public bool UseRevealPotion()
-    {
-        if (revealPotions > 0)
-        {
-            revealPotions--;
-            return true;
-        }
-        return false;
-    }
-
-    public bool SpendCoins(int amount)
-    {
-        if (coins >= amount)
-        {
-            coins -= amount;
-            return true;
-        }
-        return false;
-    }
-
     public void ResetInventory()
     {
         healPotions = 0;

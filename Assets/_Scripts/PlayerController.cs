@@ -72,11 +72,17 @@ public class PlayerController : MonoBehaviour
     public PlayerAbilitiesData abilitiesData;
 
     [Header("Reveal Potion")]
+    public bool revealActivated = false;
     public CursorRevealCircle revealCircle;   
     public float fullRevealDuration = 5f;   
     public float fullRevealRadius = 4000f;    
     public KeyCode revealPotionKey = KeyCode.Q; 
     private Coroutine fullRevealCo;
+
+    [Header("Inventory")]
+    public InventoryData inventoryData; // Drag your InventoryData asset here
+    public string potionItemID = "RevealPotion"; // optional: use ID if your InventoryData is ID-based
+
 
 
 
@@ -96,7 +102,11 @@ public class PlayerController : MonoBehaviour
         }
         if (Input.GetKeyDown(revealPotionKey))
         {
-            UseRevealPotion();
+            if (revealActivated == false)
+            {
+                UseRevealPotion();
+            }
+            
         }
         horizontal = Input.GetAxisRaw("Horizontal");
 
@@ -424,45 +434,48 @@ public class PlayerController : MonoBehaviour
     // ⬇️ Add these methods anywhere in the class
 public void UseRevealPotion()
 {
-    if (revealCircle == null) return;
-    if (fullRevealCo != null) StopCoroutine(fullRevealCo);   
+    if (revealCircle == null || inventoryData == null) return;
+    if (inventoryData.revealPotions <= 0) 
+    {
+        return;
+    }
+    inventoryData.revealPotions--;
+    if (fullRevealCo != null) StopCoroutine(fullRevealCo);
     fullRevealCo = StartCoroutine(FullRevealRoutine());
 }
 
-private IEnumerator FullRevealRoutine()
-{
-    float originalRadius = revealCircle.revealRadius;
-    float targetRadius = fullRevealRadius;
 
-    float growTime = 1f; // seconds to grow to full size
-    float timer = 0f;
-
-    // Smoothly grow the radius
-    while (timer < growTime)
+    private IEnumerator FullRevealRoutine()
     {
-        timer += Time.deltaTime;
-        float t = timer / growTime;
-        revealCircle.revealRadius = Mathf.Lerp(originalRadius, targetRadius, t);
-        yield return null;
-    }
+        float originalRadius = revealCircle.revealRadius;
+        float targetRadius = fullRevealRadius;
 
-    // Hold at full size for the remaining time
-    yield return new WaitForSeconds(fullRevealDuration - growTime);
+        float growTime = 1f;
+        float timer = 0f;
+        revealActivated = true;
+        while (timer < growTime)
+        {
+            timer += Time.deltaTime;
+            float t = timer / growTime;
+            revealCircle.revealRadius = Mathf.Lerp(originalRadius, targetRadius, t);
+            yield return null;
+        }
 
-    // Smoothly shrink back to original
-    timer = 0f;
-    while (timer < growTime)
-    {
-        timer += Time.deltaTime;
-        float t = timer / growTime;
-        revealCircle.revealRadius = Mathf.Lerp(targetRadius, originalRadius, t);
-        yield return null;
-    }
+        yield return new WaitForSeconds(fullRevealDuration - growTime);
 
-    // Ensure exact original radius at the end
-    revealCircle.revealRadius = originalRadius;
+        timer = 0f;
+        while (timer < growTime)
+        {
+            timer += Time.deltaTime;
+            float t = timer / growTime;
+            revealCircle.revealRadius = Mathf.Lerp(targetRadius, originalRadius, t);
+            yield return null;
+        }
 
-    fullRevealCo = null;
+        revealCircle.revealRadius = originalRadius;
+
+        fullRevealCo = null;
+        revealActivated = false;
 }
 
 

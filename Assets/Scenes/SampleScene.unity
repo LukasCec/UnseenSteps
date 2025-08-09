@@ -20514,6 +20514,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2101240906}
     - target: {fileID: 2570497154919352675, guid: 85f10cd069e41464f8ae4a5593c345f1, type: 3}
+      propertyPath: inventoryData
+      value: 
+      objectReference: {fileID: 11400000, guid: d0228b304b1f70d4ab362803a4034233, type: 2}
+    - target: {fileID: 2570497154919352675, guid: 85f10cd069e41464f8ae4a5593c345f1, type: 3}
       propertyPath: dragableLayer.m_Bits
       value: 1024
       objectReference: {fileID: 0}
