@@ -25,9 +25,23 @@ public class CollectibleItem : MonoBehaviour
     [Header("Pickup Effect")]
     public GameObject pickupEffectPrefab;
 
-    private void Awake()
+    [Header("Floating Animation")]
+    public float floatAmplitude = 0.25f; 
+    public float floatFrequency = 1f;    
+    private Vector3 startPos;
+    private float phaseOffset; 
+
+    private void Start()
     {
-        UpdateUI(); 
+        startPos = transform.position;
+        phaseOffset = Random.Range(0f, Mathf.PI * 2f); 
+        UpdateUI();
+    }
+
+    private void Update()
+    {
+        float newY = startPos.y + Mathf.Sin((Time.time * floatFrequency) + phaseOffset) * floatAmplitude;
+        transform.position = new Vector3(startPos.x, newY, startPos.z);
     }
 
     private void OnTriggerEnter2D(Collider2D other)

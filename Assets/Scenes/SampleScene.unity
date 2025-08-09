@@ -20320,11 +20320,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3699353472570464538, guid: d86576e2b67b923469f64997b2465ed0, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -102.25
+      value: -94.7
       objectReference: {fileID: 0}
     - target: {fileID: 3699353472570464538, guid: d86576e2b67b923469f64997b2465ed0, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 8.91
+      value: 9.6
       objectReference: {fileID: 0}
     - target: {fileID: 3699353472570464538, guid: d86576e2b67b923469f64997b2465ed0, type: 3}
       propertyPath: m_LocalPosition.z
@@ -20374,6 +20374,10 @@ PrefabInstance:
       propertyPath: revealText
       value: 
       objectReference: {fileID: 715448985}
+    - target: {fileID: 8131279349610383035, guid: d86576e2b67b923469f64997b2465ed0, type: 3}
+      propertyPath: floatAmplitude
+      value: 0.15
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -20629,11 +20633,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 414921552137814342, guid: 21c89342ad74dfe47bc9dc7249b99136, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -100.23
+      value: -94.04
       objectReference: {fileID: 0}
     - target: {fileID: 414921552137814342, guid: 21c89342ad74dfe47bc9dc7249b99136, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 8.91
+      value: 9.6
       objectReference: {fileID: 0}
     - target: {fileID: 414921552137814342, guid: 21c89342ad74dfe47bc9dc7249b99136, type: 3}
       propertyPath: m_LocalPosition.z
@@ -20683,6 +20687,10 @@ PrefabInstance:
       propertyPath: revealText
       value: 
       objectReference: {fileID: 715448985}
+    - target: {fileID: 7068911829858850494, guid: 21c89342ad74dfe47bc9dc7249b99136, type: 3}
+      propertyPath: floatAmplitude
+      value: 0.15
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -20708,17 +20716,21 @@ PrefabInstance:
       propertyPath: revealText
       value: 
       objectReference: {fileID: 715448985}
+    - target: {fileID: 1661019055782094625, guid: 1a6b8182e4519884d8164b541d1d267c, type: 3}
+      propertyPath: floatAmplitude
+      value: 0.15
+      objectReference: {fileID: 0}
     - target: {fileID: 5830315522499572566, guid: 1a6b8182e4519884d8164b541d1d267c, type: 3}
       propertyPath: m_Name
       value: Coin
       objectReference: {fileID: 0}
     - target: {fileID: 6270310242777530226, guid: 1a6b8182e4519884d8164b541d1d267c, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -99.49
+      value: -93.299995
       objectReference: {fileID: 0}
     - target: {fileID: 6270310242777530226, guid: 1a6b8182e4519884d8164b541d1d267c, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 8.91
+      value: 9.6
       objectReference: {fileID: 0}
     - target: {fileID: 6270310242777530226, guid: 1a6b8182e4519884d8164b541d1d267c, type: 3}
       propertyPath: m_LocalPosition.z
