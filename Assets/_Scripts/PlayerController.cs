@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using TMPro;
 
 public class PlayerController : MonoBehaviour
 {
@@ -85,8 +86,14 @@ public class PlayerController : MonoBehaviour
     private PlayerHealth playerHealth;
 
     [Header("Inventory")]
-    public InventoryData inventoryData; // Drag your InventoryData asset here
-    public string potionItemID = "RevealPotion"; // optional: use ID if your InventoryData is ID-based
+    public InventoryData inventoryData; 
+    public string potionItemID = "RevealPotion";
+
+
+    [Header("Inventory UI (TMP)")]
+    public TMP_Text healText;
+    public TMP_Text revealText;
+    public TMP_Text coinsText;
 
 
 
@@ -442,32 +449,52 @@ public class PlayerController : MonoBehaviour
         yield return new WaitForSeconds(delay);
         currentJumpCount = maxJumpCount;
     }
-   
-public void UseRevealPotion()
-{
-    if (revealCircle == null || inventoryData == null) return;
-    if (inventoryData.revealPotions <= 0) 
+
+    public void UseRevealPotion()
     {
-        return;
-    }
-        if (!inventoryData.UseRevealPotion()) return;
+        if (revealCircle == null || inventoryData == null) return;
+        if (!inventoryData.UseRevealPotion()) return; 
+
+        RefreshInventoryUI(); 
+
         if (fullRevealCo != null) StopCoroutine(fullRevealCo);
-    fullRevealCo = StartCoroutine(FullRevealRoutine());
-}
+        fullRevealCo = StartCoroutine(FullRevealRoutine());
+    }
 
     public void UseHealthPotion()
     {
         if (inventoryData == null || playerHealth == null) return;
-
-        
         if (playerHealth.health >= playerHealth.maxHealth) return;
 
         if (inventoryData.UseHealPotion())
         {
-            playerHealth.Heal(healAmount); 
-                                          
+            playerHealth.Heal(healAmount);
+            RefreshInventoryUI(); 
         }
+    }
+
+    void OnEnable()
+    {
+        if (inventoryData != null)
+            inventoryData.OnInventoryChanged += RefreshInventoryUI;
+
         
+        RefreshInventoryUI();
+    }
+
+    void OnDisable()
+    {
+        if (inventoryData != null)
+            inventoryData.OnInventoryChanged -= RefreshInventoryUI;
+    }
+
+    private void RefreshInventoryUI()
+    {
+        if (inventoryData == null) return;
+
+        if (healText) healText.text = $"{inventoryData.healPotions}";
+        if (revealText) revealText.text = $"{inventoryData.revealPotions}";
+        if (coinsText) coinsText.text = inventoryData.coins.ToString();
     }
 
 
