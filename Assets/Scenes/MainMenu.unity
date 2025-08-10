@@ -286,7 +286,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a6e769db3228f854e8f016001eab6af2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playSceneName: SampleScene
+  playSceneName: sampleScene
   playSceneIndex: 1
   fadeAnimator: {fileID: 0}
   fadeDuration: 0.5
