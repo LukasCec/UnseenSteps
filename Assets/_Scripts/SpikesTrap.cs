@@ -12,6 +12,12 @@ public class SpikesTrap : MonoBehaviour
 
     public void EnableHitbox()
     {
+        if (IsVisibleToCamera(Camera.main))
+        {
+            if (AudioManager.Instance != null)
+                AudioManager.Instance.PlaySFX("spike");
+        }
+
         hitboxObject.SetActive(true);
 
         // Manuálne udeli damage hráèovi, ak už v tom momente stojí v hitboxe
@@ -32,6 +38,14 @@ public class SpikesTrap : MonoBehaviour
                 }
             }
         }
+    }
+    private bool IsVisibleToCamera(Camera cam)
+    {
+        if (cam == null) return false;
+        Vector3 viewportPos = cam.WorldToViewportPoint(transform.position);
+        return viewportPos.z > 0 &&
+               viewportPos.x > 0 && viewportPos.x < 1 &&
+               viewportPos.y > 0 && viewportPos.y < 1;
     }
 
     public void DisableHitbox()

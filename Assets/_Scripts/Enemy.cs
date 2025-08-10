@@ -1,4 +1,3 @@
-// Enemy.cs
 using UnityEngine;
 using System.Collections;
 
@@ -76,7 +75,6 @@ public class Enemy : MonoBehaviour
         isAttacking = false;
         canAttack = true;
     }
-
 
     public void EnableHitbox()
     {

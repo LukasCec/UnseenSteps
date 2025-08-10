@@ -37,7 +37,6 @@ public class DisappearingPlatform : MonoBehaviour
         }
     }
 
-    
     void OnCollisionEnter2D(Collision2D collision)
     {
         if (!collision.collider.CompareTag(playerTag)) return;
@@ -104,7 +103,6 @@ public class DisappearingPlatform : MonoBehaviour
 
         isCycling = false;
     }
-
     
     public void ForceCollapseNow()
     {

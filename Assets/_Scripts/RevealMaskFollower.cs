@@ -25,7 +25,5 @@ public class RevealMaskFollower : MonoBehaviour
 
         smoothPosition = Vector3.Lerp(smoothPosition, mouseWorld, Time.deltaTime * followSpeed * sensitivity);
         transform.position = smoothPosition;
-
-     
     }
 }

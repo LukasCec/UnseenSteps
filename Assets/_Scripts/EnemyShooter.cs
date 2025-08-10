@@ -14,7 +14,6 @@ public class EnemyShooter : MonoBehaviour
 
     private bool canAttack = true;
 
-    // Komponenty
     private EnemyHealth enemyHealth;  // stará sa o HP
     private EnemyWalk enemyWalk;      // stará sa o pohyb + flip okraj/stena
     private Rigidbody2D rb;
@@ -105,7 +104,9 @@ public class EnemyShooter : MonoBehaviour
     void StopAndShoot()
     {
         if (canAttack)
-            StartCoroutine(ShootRoutine());
+            if (AudioManager.Instance != null)
+                AudioManager.Instance.PlaySFX("enemyShoot");
+        StartCoroutine(ShootRoutine());
     }
 
     IEnumerator ShootRoutine()

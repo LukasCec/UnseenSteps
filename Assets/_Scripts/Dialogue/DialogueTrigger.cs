@@ -14,7 +14,6 @@ public class DialogueTrigger : MonoBehaviour
     {
         playerInRange = false;  
         visualCue.SetActive(false);
-       
     }
 
     private void Update()
@@ -24,6 +23,8 @@ public class DialogueTrigger : MonoBehaviour
             visualCue.SetActive(true);
             if (Input.GetKeyDown(KeyCode.E))
             {
+                if (AudioManager.Instance != null)
+                    AudioManager.Instance.PlaySFX("merchant");
                 DialogueManager.GetInstance().EnterDialogueMode(inkJSON);
             }
         }
@@ -32,7 +33,6 @@ public class DialogueTrigger : MonoBehaviour
             visualCue.SetActive(false);
         }
     }
-
 
     private void OnTriggerEnter2D(Collider2D collider)
     {

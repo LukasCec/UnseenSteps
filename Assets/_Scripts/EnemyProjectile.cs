@@ -20,9 +20,7 @@ public class EnemyProjectile : MonoBehaviour
             PlayerHealth player = other.GetComponent<PlayerHealth>();
             if (player != null)
             {
-               
                 player.TakeDamage(damage, transform.position);
-                
             }
         }
 

@@ -1,4 +1,3 @@
-// EnemyWalk.cs
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]

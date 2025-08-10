@@ -15,18 +15,24 @@ public class InventoryData : ScriptableObject
    
     public void AddHealPotion(int amount = 1)
     {
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlaySFX("item");
         healPotions = Mathf.Max(0, healPotions + amount);
         RaiseChanged();
     }
 
     public void AddRevealPotion(int amount = 1)
     {
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlaySFX("item");
         revealPotions = Mathf.Max(0, revealPotions + amount);
         RaiseChanged();
     }
 
     public void AddCoins(int amount = 1)
     {
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlaySFX("coin");
         coins = Mathf.Max(0, coins + amount);
         RaiseChanged();
     }
@@ -49,6 +55,8 @@ public class InventoryData : ScriptableObject
         {
             revealPotions--;
             RaiseChanged();
+            if (AudioManager.Instance != null)
+                AudioManager.Instance.PlaySFX("reveal");
             return true;
         }
         return false;
@@ -65,7 +73,6 @@ public class InventoryData : ScriptableObject
         return false;
     }
 
-    
     public void ResetInventory()
     {
         healPotions = 0;

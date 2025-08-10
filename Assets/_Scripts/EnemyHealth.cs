@@ -26,7 +26,6 @@ public class EnemyHealth : MonoBehaviour, IDamageable
             Destroy(gameObject);
         }
     }
-
     private IEnumerator BlinkEffect()
     {
         int blinkCount = 3;
