@@ -64,6 +64,8 @@ public class DialogueManager : MonoBehaviour
         {
             ContinueStory();
         }
+
+
     }
 
     public void EnterDialogueMode(TextAsset inkJSON)
@@ -90,6 +92,10 @@ public class DialogueManager : MonoBehaviour
         if (currentStory.canContinue)
         {
             string dialogueToDisplay = currentStory.Continue();
+
+            
+            HandleTags(currentStory.currentTags);
+
             StopAllCoroutines();
             StartCoroutine(TypeDialogue(dialogueToDisplay));
             DisplayChoices();
@@ -99,7 +105,28 @@ public class DialogueManager : MonoBehaviour
             StartCoroutine(ExitDialogueMode());
         }
     }
-  
+
+    private void HandleTags(System.Collections.Generic.List<string> tags)
+    {
+        if (tags == null) return;
+
+        foreach (var tag in tags)
+        {
+            
+            if (tag.StartsWith("OPEN_SHOP"))
+            {
+                
+                string category = "DEFAULT";
+                var parts = tag.Split(':');
+                if (parts.Length > 1) category = parts[1];
+
+                if (ShopManager.Instance != null)
+                    ShopManager.Instance.Open(category);
+            }
+           
+        }
+    }
+
 
     private void DisplayChoices()
     {
