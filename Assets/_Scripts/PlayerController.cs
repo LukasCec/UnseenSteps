@@ -47,7 +47,6 @@ public class PlayerController : MonoBehaviour
     float wallStickCounter;
     float horizontal;
 
-
     [Header("Dragging")]
     [Tooltip("Layers containing dragable objects")]
     public LayerMask dragableLayer;
@@ -82,21 +81,17 @@ public class PlayerController : MonoBehaviour
 
     [Header("Health Potion")]
     public KeyCode healthPotionKey = KeyCode.E;
-    public int healAmount = 2;                 // koľko HP doplní jeden potion
+    public int healAmount = 2;
     private PlayerHealth playerHealth;
 
     [Header("Inventory")]
     public InventoryData inventoryData; 
     public string potionItemID = "RevealPotion";
 
-
     [Header("Inventory UI (TMP)")]
     public TMP_Text healText;
     public TMP_Text revealText;
     public TMP_Text coinsText;
-
-
-
 
     void Start()
     {
@@ -113,19 +108,20 @@ public class PlayerController : MonoBehaviour
         {
             ResetScene();
         }
+
         if (Input.GetKeyDown(revealPotionKey))
         {
             if (revealActivated == false)
             {
                 UseRevealPotion();
             }
-            
         }
 
         if (Input.GetKeyDown(healthPotionKey))
         {
             UseHealthPotion();
         }
+
         horizontal = Input.GetAxisRaw("Horizontal");
         if (isAttacking)
         {
@@ -147,6 +143,7 @@ public class PlayerController : MonoBehaviour
         }
 
         if (isStunned) return;
+
         if (DialogueManager.GetInstance().dialogueIsPlaying)
         {
             return;
@@ -176,12 +173,15 @@ public class PlayerController : MonoBehaviour
         {
             isAttacking = true;
             animator.SetTrigger(AnimationStrings.Attack);
+            if (AudioManager.Instance != null)
+                AudioManager.Instance.PlaySFX("playerHit");
         }
 
         if (Input.GetKeyDown(KeyCode.LeftShift) && abilitiesData.canDash && !isDashing && Time.time - lastDashTime >= dashCooldown)
         {
             StartCoroutine(Dash());
         }
+
         if (Input.GetMouseButtonDown(1))
             TryStartDrag();
 
@@ -202,6 +202,7 @@ public class PlayerController : MonoBehaviour
             rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
             return;
         }
+
         if (isDashing) return;
 
         if (DialogueManager.GetInstance().dialogueIsPlaying)
@@ -229,34 +230,36 @@ public class PlayerController : MonoBehaviour
         CheckGround();
         CheckWall();
     }
-
     void Jump()
     {
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlaySFX("jump");
         Vector3 spawnPos = groundCheck.position;
         Instantiate(jumpEffectPrefab, spawnPos, Quaternion.identity);
         currentJumpCount--;
     }
-
     IEnumerator WallJump()
     {
         canWallStick = false;
         float jumpDirection = isFacingRight() ? -1 : 1;
         rb.linearVelocity = new Vector2(wallJumpForceX * jumpDirection, wallJumpForceY);
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlaySFX("jump");
         isWallSliding = false;
         wallStickCounter = stickTime;
 
         yield return new WaitForSeconds(wallJumpCooldown);
         canWallStick = true;
     }
-
     IEnumerator Dash()
     {
 
         isDashing = true;
         lastDashTime = Time.time; // tu sa spust cooldown
         Instantiate(dashEffectPrefab, transform.position, Quaternion.identity);
-
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlaySFX("dash");
         float originalGravity = rb.gravityScale;
         rb.gravityScale = 0f;
         rb.linearVelocity = new Vector2(horizontal * dashSpeed, 0f);
@@ -310,7 +313,6 @@ public class PlayerController : MonoBehaviour
 
         wasGroundedLastFrame = isGrounded;
     }
-
 
     void SpawnLandingEffect()
     {
@@ -430,6 +432,7 @@ public class PlayerController : MonoBehaviour
             isDragging = true;
         }
     }
+
     private void EndDrag()
     {
         if (currentDrag != null)
@@ -438,11 +441,6 @@ public class PlayerController : MonoBehaviour
             currentDrag = null;
         }
         isDragging = false;
-    }
-
-    private void HandleMovementInputsOnly()
-    {
-        rb.linearVelocity = new Vector2(horizontal * speed, rb.linearVelocity.y);
     }
 
     private void FaceDragable()
@@ -508,7 +506,6 @@ public class PlayerController : MonoBehaviour
         if (coinsText) coinsText.text = inventoryData.coins.ToString();
     }
 
-
     private IEnumerator FullRevealRoutine()
     {
         float originalRadius = revealCircle.revealRadius;
@@ -540,9 +537,5 @@ public class PlayerController : MonoBehaviour
 
         fullRevealCo = null;
         revealActivated = false;
+    }
 }
-
-
-
-}
-

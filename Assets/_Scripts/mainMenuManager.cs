@@ -1,9 +1,8 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
-using System.Collections;
 
-public class MainMenuController : MonoBehaviour
+public class MainMenuManager : MonoBehaviour
 {
     [Header("Scene To Load")]
     [Tooltip("N·zov alebo index scÈny, ktor· sa m· spustiù po Play.")]
@@ -14,17 +13,23 @@ public class MainMenuController : MonoBehaviour
     public Animator fadeAnimator;          
     public float fadeDuration = 0.5f;      
 
-    [Header("Optional: SFX")]
-    public AudioSource uiClickSfx;
+    void Start()
+    {
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlayMusic("background");
+    }
 
-   
     public void OnPlayPressed()
     {
         PlayClick();
         StartCoroutine(LoadGame());
     }
 
-   
+    public void OnSettingsPressed()
+    {
+        PlayClick();
+    }
+
     public void OnExitPressed()
     {
         PlayClick();
@@ -55,9 +60,9 @@ public class MainMenuController : MonoBehaviour
 
     private void PlayClick()
     {
-        if (uiClickSfx != null) uiClickSfx.Play();
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlaySFX("buttonClick");
     }
-
  
     private void Update()
     {

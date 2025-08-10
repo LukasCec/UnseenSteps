@@ -8,7 +8,6 @@ public class EnemyAttackHitbox : MonoBehaviour
 
     private bool canDealDamage;
 
-   
     public void BeginWindow()
     {
         canDealDamage = true;
@@ -35,7 +34,6 @@ public class EnemyAttackHitbox : MonoBehaviour
 
         if (ph != null)
         {
-            Debug.Log("Hraca trafil");
             ph.TakeDamage(damage, transform.position);
             canDealDamage = false;
         }

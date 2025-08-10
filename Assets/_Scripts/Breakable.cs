@@ -28,9 +28,6 @@ public class Breakable : MonoBehaviour, IDamageable
         sr = GetComponent<SpriteRenderer>();
     }
 
-    /// <summary>
-    /// Called when the object takes damage.
-    /// </summary>
     public void TakeDamage(int dmg)
     {
         currentStrength -= dmg;
@@ -59,7 +56,6 @@ public class Breakable : MonoBehaviour, IDamageable
 
     private IEnumerator ShakeEffect()
     {
-        // zaznamenme si sasn svetov pozciu
         Vector3 originalPos = transform.position;
         float elapsed = 0f;
 
@@ -73,13 +69,14 @@ public class Breakable : MonoBehaviour, IDamageable
             yield return null;
         }
 
-        // vrtime presne na t ist pozciu
         transform.position = originalPos;
     }
 
     private void Break()
     {
-        // Destruction particles
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlaySFX("crateBreak");
+
         if (destructionParticles != null)
         {
             var ps = Instantiate(
@@ -93,7 +90,6 @@ public class Breakable : MonoBehaviour, IDamageable
             );
         }
 
-        // Znii samotn GameObject
         Destroy(gameObject);
     }
 }

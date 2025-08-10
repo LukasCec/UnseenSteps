@@ -44,14 +44,11 @@ public class ShopManager : MonoBehaviour
     {
         shopPanel.SetActive(true);
         Refresh();
-        
-        // Time.timeScale = 0f;
     }
 
     public void Close()
     {
         shopPanel.SetActive(false);
-        // Time.timeScale = 1f;
     }
 
     public void BuyHeal()
