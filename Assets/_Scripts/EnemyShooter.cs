@@ -24,6 +24,10 @@ public class EnemyShooter : MonoBehaviour
     public float flipCooldown = 0.5f;
     private float lastFlipTime = 0f;
 
+    [Header("Aiming")]
+    public float aimUpOffset = 0.2f;       // raises aim point a bit
+    public float minElevationAngle = 5f;
+
     void Awake()
     {
         enemyHealth = GetComponent<EnemyHealth>();
@@ -100,40 +104,51 @@ public class EnemyShooter : MonoBehaviour
         }
     }
 
-    /// <summary>ZastavÌme a zaËneme strieæaù, pokiaæ mÙûeme</summary>
+    
     void StopAndShoot()
     {
         if (canAttack)
+        {
             if (AudioManager.Instance != null)
                 AudioManager.Instance.PlaySFX("enemyShoot");
-        StartCoroutine(ShootRoutine());
+
+            StartCoroutine(ShootRoutine());
+        }
     }
+
 
     IEnumerator ShootRoutine()
     {
         canAttack = false;
 
-        // Spusti anim·ciu
+       
         animator.SetTrigger(EnemyShooterAnimationStrings.IsAttacking);
 
       
        
         ShootProjectile();
 
-        // cooldown
         yield return new WaitForSeconds(attackCooldown);
         canAttack = true;
     }
 
-    /// <summary> VytvorÌ strelu smerom k hr·Ëovi </summary>
+
     void ShootProjectile()
     {
-        if (projectilePrefab == null || firePoint == null || player == null) return;
+        if (!projectilePrefab || !firePoint || !player) return;
 
-        GameObject bullet = Instantiate(projectilePrefab, firePoint.position, Quaternion.identity);
-        Rigidbody2D rbBullet = bullet.GetComponent<Rigidbody2D>();
-        Vector2 dir = (player.position - firePoint.position).normalized;
-        rbBullet.linearVelocity = dir * 10f; // r˝chlosù strely
+        var bullet = Instantiate(projectilePrefab, firePoint.position, Quaternion.identity);
+        var rbBullet = bullet.GetComponent<Rigidbody2D>();
+        if (rbBullet) rbBullet.gravityScale = 0f;
+
+        Vector2 target = (Vector2)player.position + Vector2.up * aimUpOffset;
+        Vector2 dir = (target - (Vector2)firePoint.position).normalized;
+
+       
+        float minY = Mathf.Sin(minElevationAngle * Mathf.Deg2Rad);
+        if (dir.y < minY) dir = new Vector2(dir.x, minY).normalized;
+
+        rbBullet.linearVelocity = dir * 10f;
     }
 
     // --- PomocnÈ debug vizu·ly ---
