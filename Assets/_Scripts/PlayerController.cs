@@ -11,6 +11,7 @@ public class PlayerController : MonoBehaviour
     [Header("Movement")]
     public float speed = 8f;
     public float jumpForce = 15f;
+    public float maxFallSpeed = -25f;
 
     [Header("Double Jump")]
     public int maxJumpCount = 2;
@@ -197,6 +198,15 @@ public class PlayerController : MonoBehaviour
     }
     void FixedUpdate()
     {
+
+        void FixedUpdate()
+        {
+            
+            if (rb.linearVelocity.y < maxFallSpeed)
+                rb.linearVelocity = new Vector2(rb.linearVelocity.x, maxFallSpeed);
+            
+        }
+
         if (isAttacking)
         {
             rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
