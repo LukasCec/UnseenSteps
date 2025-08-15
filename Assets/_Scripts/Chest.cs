@@ -52,6 +52,8 @@ public class Chest : MonoBehaviour
     {
         isOpened = true;
         animator.SetTrigger("OpenChest");
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlaySFX("chestOpen");
 
         yield return new WaitForSeconds(openDelay); 
 

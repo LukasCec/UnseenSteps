@@ -1290,7 +1290,7 @@ MonoBehaviour:
     volume: 1
   - name: playerHit
     clip: {fileID: 8300000, guid: 562ccbe2d510cf549a2d1fbe19f09bbb, type: 3}
-    volume: 1
+    volume: 0.9994
   - name: enemyHit
     clip: {fileID: 8300000, guid: 5d825b25b33273746b1914cdeef54ede, type: 3}
     volume: 1
@@ -1299,13 +1299,13 @@ MonoBehaviour:
     volume: 1
   - name: enemyMiss
     clip: {fileID: 8300000, guid: 587cdfb47e87f57478c2e9880032902d, type: 3}
-    volume: 0.44
+    volume: 1
   - name: enemyDeath1
     clip: {fileID: 8300000, guid: 6e4a89a130a71e44abd5795a209a759d, type: 3}
-    volume: 0.44
+    volume: 1
   - name: enemyDeath2
     clip: {fileID: 8300000, guid: 1a9bb13205218ce49afaca98fcba9a12, type: 3}
-    volume: 0.44
+    volume: 1
   - name: jump
     clip: {fileID: 8300000, guid: 805a47feb58f23b4f8fb12bd4c6e1719, type: 3}
     volume: 1
@@ -1336,6 +1336,12 @@ MonoBehaviour:
   - name: bossDie
     clip: {fileID: 8300000, guid: bcaa1307dac45f745b63a7dbfaace89f, type: 3}
     volume: 0.333
+  - name: chestOpen
+    clip: {fileID: 8300000, guid: 25da4de16458a634aa1af6ef916e6357, type: 3}
+    volume: 1
+  - name: chestUnlock
+    clip: {fileID: 8300000, guid: e25b12c6418b04f4e99c059277437346, type: 3}
+    volume: 1
 --- !u!1 &1620915920
 GameObject:
   m_ObjectHideFlags: 0
