@@ -286,7 +286,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a6e769db3228f854e8f016001eab6af2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playSceneName: sampleScene
+  playSceneName: Level_1
   playSceneIndex: 1
   fadeAnimator: {fileID: 0}
   fadeDuration: 0.5
@@ -1283,7 +1283,7 @@ MonoBehaviour:
   musics:
   - name: background
     clip: {fileID: 8300000, guid: e6eade7d1e9992c40933cf08aa43de6c, type: 3}
-    volume: 0.206
+    volume: 0.1
   sfx:
   - name: buttonClick
     clip: {fileID: 8300000, guid: 000b657d4381f2641b2f288624d62a7c, type: 3}
@@ -1297,11 +1297,20 @@ MonoBehaviour:
   - name: enemyShoot
     clip: {fileID: 8300000, guid: 0a8ff1313819dd24ab657f06ff3612be, type: 3}
     volume: 1
+  - name: enemyMiss
+    clip: {fileID: 8300000, guid: 587cdfb47e87f57478c2e9880032902d, type: 3}
+    volume: 0.44
+  - name: enemyDeath1
+    clip: {fileID: 8300000, guid: 6e4a89a130a71e44abd5795a209a759d, type: 3}
+    volume: 0.44
+  - name: enemyDeath2
+    clip: {fileID: 8300000, guid: 1a9bb13205218ce49afaca98fcba9a12, type: 3}
+    volume: 0.44
   - name: jump
     clip: {fileID: 8300000, guid: 805a47feb58f23b4f8fb12bd4c6e1719, type: 3}
     volume: 1
   - name: dash
-    clip: {fileID: 8300000, guid: 587cdfb47e87f57478c2e9880032902d, type: 3}
+    clip: {fileID: 8300000, guid: c075e869f35295541a78785e63dc6421, type: 3}
     volume: 1
   - name: coin
     clip: {fileID: 8300000, guid: 072bfe62b8113ab4a822994146a36aa3, type: 3}
@@ -1320,10 +1329,10 @@ MonoBehaviour:
     volume: 0.333
   - name: merchant
     clip: {fileID: 8300000, guid: f8e31f9357ab12a48ad0c83504608520, type: 3}
-    volume: 0.333
+    volume: 1
   - name: crateBreak
     clip: {fileID: 8300000, guid: dd1cca54788b46947876d2c231934dc5, type: 3}
-    volume: 0.333
+    volume: 1
   - name: bossDie
     clip: {fileID: 8300000, guid: bcaa1307dac45f745b63a7dbfaace89f, type: 3}
     volume: 0.333

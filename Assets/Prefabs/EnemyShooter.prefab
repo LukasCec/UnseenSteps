@@ -74,8 +74,8 @@ GameObject:
   - component: {fileID: 2676458052818138497}
   - component: {fileID: 5781437939201222374}
   - component: {fileID: 2389578811201936797}
-  - component: {fileID: 2490773812442311223}
   - component: {fileID: 1788397864288918995}
+  - component: {fileID: 2490773812442311223}
   - component: {fileID: 4760284477187587757}
   - component: {fileID: 7384222942208718158}
   m_Layer: 9
@@ -231,23 +231,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
---- !u!114 &2490773812442311223
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8651098197995318093}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3853567ef22e1114db512b88ef7a731f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  detectionRange: 6
-  firePoint: {fileID: 6764870248651692110}
-  projectilePrefab: {fileID: 8644495375069192294, guid: e8ea2e2f4870e0b4ab16f41e71611bce, type: 3}
-  attackCooldown: 1
-  flipCooldown: 0.5
 --- !u!95 &1788397864288918995
 Animator:
   serializedVersion: 7
@@ -270,6 +253,25 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &2490773812442311223
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8651098197995318093}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3853567ef22e1114db512b88ef7a731f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  detectionRange: 6
+  firePoint: {fileID: 6764870248651692110}
+  projectilePrefab: {fileID: 8644495375069192294, guid: e8ea2e2f4870e0b4ab16f41e71611bce, type: 3}
+  attackCooldown: 1
+  flipCooldown: 0.5
+  aimUpOffset: 0.2
+  minElevationAngle: 5
 --- !u!114 &4760284477187587757
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -302,6 +304,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   isFacingRight: 1
+  flipCooldown: 0.2
 --- !u!1 &9168500273341934363
 GameObject:
   m_ObjectHideFlags: 0
