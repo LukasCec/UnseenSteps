@@ -21,6 +21,8 @@ public class Enemy : MonoBehaviour
     private EnemyWalk enemyWalk;
     private Transform player;
 
+    private EnemyAttackHitbox attackDealer;
+
     void Awake()
     {
         animator = GetComponent<Animator>();
@@ -28,22 +30,37 @@ public class Enemy : MonoBehaviour
         enemyWalk = GetComponent<EnemyWalk>();
         player = GameObject.FindWithTag("Player")?.transform;
 
-        
-        hitboxCollider.enabled = false;
+        // hitbox na štarte vypneme
+        if (hitboxCollider != null) hitboxCollider.enabled = false;
+
+        // nájdeme dealer a prihlásime sa na eventy
+        attackDealer = hitboxCollider ? hitboxCollider.GetComponent<EnemyAttackHitbox>() : null;
+        if (attackDealer != null)
+        {
+            //attackDealer.OnSuccessfulHit += HandleHit;
+            attackDealer.OnMiss += HandleMiss;
+        }
+    }
+
+    void OnDestroy()
+    {
+        if (attackDealer != null)
+        {
+            attackDealer.OnSuccessfulHit -= HandleHit;
+            attackDealer.OnMiss -= HandleMiss;
+        }
     }
 
     void FixedUpdate()
     {
         if (isAttacking)
         {
-            
             rb.linearVelocity = Vector2.zero;
             animator.SetBool("isMoving", false);
             enemyWalk.enabled = false;
         }
         else
         {
-           
             enemyWalk.enabled = true;
             bool moving = Mathf.Abs(rb.linearVelocity.x) > 0.01f;
             animator.SetBool("isMoving", moving);
@@ -76,11 +93,11 @@ public class Enemy : MonoBehaviour
         canAttack = true;
     }
 
+    // Volané z animácie (Animation Event) na zaèiatku aktívneho okna
     public void EnableHitbox()
     {
         if (hitboxCollider != null)
         {
-            
             var dealer = hitboxCollider.GetComponent<EnemyAttackHitbox>();
             if (dealer != null) dealer.BeginWindow();
 
@@ -89,16 +106,29 @@ public class Enemy : MonoBehaviour
         }
     }
 
+    // Volané z animácie (Animation Event) na konci aktívneho okna
     public void DisableHitbox()
     {
         if (hitboxCollider != null)
         {
-            
             var dealer = hitboxCollider.GetComponent<EnemyAttackHitbox>();
             if (dealer != null) dealer.EndWindow();
 
             hitboxCollider.enabled = false;
             Debug.Log("Hitbox DISABLED");
         }
+    }
+
+    // Zvukové centralizované odozvy
+    private void HandleHit()
+    {
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlaySFX("enemyHit");
+    }
+
+    private void HandleMiss()
+    {
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlaySFX("enemyMiss");
     }
 }

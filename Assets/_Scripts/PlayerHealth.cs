@@ -28,7 +28,7 @@ public class PlayerHealth : MonoBehaviour, IDamageable
     {
         if (health <= 0) return;
 
-        if (AudioManager.Instance != null) 
+        if (AudioManager.Instance != null)
             AudioManager.Instance.PlaySFX("enemyHit");
         health = Mathf.Clamp(health - dmg, 0, maxHealth);
         Debug.Log("Player hit! HP: " + health);

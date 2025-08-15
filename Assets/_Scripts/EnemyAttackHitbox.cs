@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 
 [RequireComponent(typeof(BoxCollider2D))]
 public class EnemyAttackHitbox : MonoBehaviour
@@ -7,16 +8,30 @@ public class EnemyAttackHitbox : MonoBehaviour
     public string targetTag = "Player";
 
     private bool canDealDamage;
+    private bool hasHit;
+
+    // Eventy pre Enemy
+    public event Action OnSuccessfulHit;
+    public event Action OnMiss;
 
     public void BeginWindow()
     {
         canDealDamage = true;
+        hasHit = false; // reset pred každým oknom útoku
         Debug.Log("Hitbox window begin");
     }
 
     public void EndWindow()
     {
         canDealDamage = false;
+
+        // ak poèas okna neprebehol zásah -> MISS
+        if (!hasHit)
+        {
+            OnMiss?.Invoke();
+            Debug.Log("Attack MISS");
+        }
+
         Debug.Log("Hitbox window end");
     }
 
@@ -35,7 +50,10 @@ public class EnemyAttackHitbox : MonoBehaviour
         if (ph != null)
         {
             ph.TakeDamage(damage, transform.position);
-            canDealDamage = false;
+            hasHit = true;          // oznaèíme, že útok trafil
+            canDealDamage = false;  // len jeden zásah v rámci okna
+            OnSuccessfulHit?.Invoke();
+            Debug.Log("Attack HIT");
         }
     }
 }

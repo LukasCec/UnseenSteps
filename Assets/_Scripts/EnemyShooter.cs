@@ -111,7 +111,6 @@ public class EnemyShooter : MonoBehaviour
         {
             if (AudioManager.Instance != null)
                 AudioManager.Instance.PlaySFX("enemyShoot");
-
             StartCoroutine(ShootRoutine());
         }
     }
@@ -120,14 +119,8 @@ public class EnemyShooter : MonoBehaviour
     IEnumerator ShootRoutine()
     {
         canAttack = false;
-
-       
         animator.SetTrigger(EnemyShooterAnimationStrings.IsAttacking);
-
-      
-       
         ShootProjectile();
-
         yield return new WaitForSeconds(attackCooldown);
         canAttack = true;
     }
