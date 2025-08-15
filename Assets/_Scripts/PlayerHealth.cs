@@ -19,17 +19,17 @@ public class PlayerHealth : MonoBehaviour, IDamageable
         sr = GetComponent<SpriteRenderer>();
         controller = GetComponent<PlayerController>();
 
-       
         health = Mathf.Clamp(health, 0, maxHealth);
     }
 
-    
     public void TakeDamage(int dmg) => TakeDamage(dmg, transform.position);
 
     public void TakeDamage(int dmg, Vector2 attackerPosition)
     {
         if (health <= 0) return;
 
+        if (AudioManager.Instance != null) 
+            AudioManager.Instance.PlaySFX("enemyHit");
         health = Mathf.Clamp(health - dmg, 0, maxHealth);
         Debug.Log("Player hit! HP: " + health);
 
@@ -49,7 +49,6 @@ public class PlayerHealth : MonoBehaviour, IDamageable
             SceneManager.LoadScene(currentScene.name);
         }
     }
-
     
     public void Heal(int amount)
     {
@@ -58,8 +57,9 @@ public class PlayerHealth : MonoBehaviour, IDamageable
         health = Mathf.Clamp(health + amount, 0, maxHealth);
         if (health != old)
         {
-            
-            //Debug.Log($"Healed to {health}/{maxHealth}");
+            Debug.Log($"Healed to {health}/{maxHealth}");
+            if (AudioManager.Instance != null)
+                AudioManager.Instance.PlaySFX("heal");
         }
     }
 

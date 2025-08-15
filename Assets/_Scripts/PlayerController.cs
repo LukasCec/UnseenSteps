@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using TMPro;
 
 public class PlayerController : MonoBehaviour
 {
@@ -10,6 +11,7 @@ public class PlayerController : MonoBehaviour
     [Header("Movement")]
     public float speed = 8f;
     public float jumpForce = 15f;
+    public float maxFallSpeed = -25f;
 
     [Header("Double Jump")]
     public int maxJumpCount = 2;
@@ -46,7 +48,6 @@ public class PlayerController : MonoBehaviour
     float wallStickCounter;
     float horizontal;
 
-
     [Header("Dragging")]
     [Tooltip("Layers containing dragable objects")]
     public LayerMask dragableLayer;
@@ -79,12 +80,19 @@ public class PlayerController : MonoBehaviour
     public KeyCode revealPotionKey = KeyCode.Q; 
     private Coroutine fullRevealCo;
 
+    [Header("Health Potion")]
+    public KeyCode healthPotionKey = KeyCode.E;
+    public int healAmount = 2;
+    private PlayerHealth playerHealth;
+
     [Header("Inventory")]
-    public InventoryData inventoryData; // Drag your InventoryData asset here
-    public string potionItemID = "RevealPotion"; // optional: use ID if your InventoryData is ID-based
+    public InventoryData inventoryData; 
+    public string potionItemID = "RevealPotion";
 
-
-
+    [Header("Inventory UI (TMP)")]
+    public TMP_Text healText;
+    public TMP_Text revealText;
+    public TMP_Text coinsText;
 
     void Start()
     {
@@ -92,6 +100,7 @@ public class PlayerController : MonoBehaviour
         animator = GetComponent<Animator>();
         wallStickCounter = stickTime;
         groundAndDragLayer = groundLayer | dragableLayer;
+        playerHealth = GetComponent<PlayerHealth>();
     }
 
     void Update()
@@ -100,15 +109,26 @@ public class PlayerController : MonoBehaviour
         {
             ResetScene();
         }
+
         if (Input.GetKeyDown(revealPotionKey))
         {
             if (revealActivated == false)
             {
                 UseRevealPotion();
             }
-            
         }
+
+        if (Input.GetKeyDown(healthPotionKey))
+        {
+            UseHealthPotion();
+        }
+
         horizontal = Input.GetAxisRaw("Horizontal");
+        if (isAttacking)
+        {
+            horizontal = 0f;
+            return; 
+        }
 
         if (isDragging)
         {
@@ -124,6 +144,7 @@ public class PlayerController : MonoBehaviour
         }
 
         if (isStunned) return;
+
         if (DialogueManager.GetInstance().dialogueIsPlaying)
         {
             return;
@@ -153,12 +174,15 @@ public class PlayerController : MonoBehaviour
         {
             isAttacking = true;
             animator.SetTrigger(AnimationStrings.Attack);
+            if (AudioManager.Instance != null)
+                AudioManager.Instance.PlaySFX("playerHit");
         }
 
         if (Input.GetKeyDown(KeyCode.LeftShift) && abilitiesData.canDash && !isDashing && Time.time - lastDashTime >= dashCooldown)
         {
             StartCoroutine(Dash());
         }
+
         if (Input.GetMouseButtonDown(1))
             TryStartDrag();
 
@@ -174,12 +198,28 @@ public class PlayerController : MonoBehaviour
     }
     void FixedUpdate()
     {
+
+        void FixedUpdate()
+        {
+            
+            if (rb.linearVelocity.y < maxFallSpeed)
+                rb.linearVelocity = new Vector2(rb.linearVelocity.x, maxFallSpeed);
+            
+        }
+
+        if (isAttacking)
+        {
+            rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+            return;
+        }
+
         if (isDashing) return;
 
         if (DialogueManager.GetInstance().dialogueIsPlaying)
         {
             return;
         }
+
         if (!isWallSliding)
         {
             if ((horizontal > 0 && !CanMoveInDirection(1)) || (horizontal < 0 && !CanMoveInDirection(-1)))
@@ -200,34 +240,36 @@ public class PlayerController : MonoBehaviour
         CheckGround();
         CheckWall();
     }
-
     void Jump()
     {
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlaySFX("jump");
         Vector3 spawnPos = groundCheck.position;
         Instantiate(jumpEffectPrefab, spawnPos, Quaternion.identity);
         currentJumpCount--;
     }
-
     IEnumerator WallJump()
     {
         canWallStick = false;
         float jumpDirection = isFacingRight() ? -1 : 1;
         rb.linearVelocity = new Vector2(wallJumpForceX * jumpDirection, wallJumpForceY);
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlaySFX("jump");
         isWallSliding = false;
         wallStickCounter = stickTime;
 
         yield return new WaitForSeconds(wallJumpCooldown);
         canWallStick = true;
     }
-
     IEnumerator Dash()
     {
 
         isDashing = true;
         lastDashTime = Time.time; // tu sa spust cooldown
         Instantiate(dashEffectPrefab, transform.position, Quaternion.identity);
-
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlaySFX("dash");
         float originalGravity = rb.gravityScale;
         rb.gravityScale = 0f;
         rb.linearVelocity = new Vector2(horizontal * dashSpeed, 0f);
@@ -281,7 +323,6 @@ public class PlayerController : MonoBehaviour
 
         wasGroundedLastFrame = isGrounded;
     }
-
 
     void SpawnLandingEffect()
     {
@@ -401,6 +442,7 @@ public class PlayerController : MonoBehaviour
             isDragging = true;
         }
     }
+
     private void EndDrag()
     {
         if (currentDrag != null)
@@ -411,18 +453,13 @@ public class PlayerController : MonoBehaviour
         isDragging = false;
     }
 
-    private void HandleMovementInputsOnly()
-    {
-        rb.linearVelocity = new Vector2(horizontal * speed, rb.linearVelocity.y);
-    }
-
     private void FaceDragable()
     {
         if (currentDrag == null) return;
         bool objectOnRight = currentDrag.transform.position.x > transform.position.x;
-        // ak je objekt napravo a ja sa nepozerm doprava, oto ma
+      
         if (objectOnRight && !isFacingRight()) Flip();
-        // ak je objekt naavo a ja sa pozerm doprava, oto ma
+       
         else if (!objectOnRight && isFacingRight()) Flip();
     }
 
@@ -431,19 +468,53 @@ public class PlayerController : MonoBehaviour
         yield return new WaitForSeconds(delay);
         currentJumpCount = maxJumpCount;
     }
-    // ⬇️ Add these methods anywhere in the class
-public void UseRevealPotion()
-{
-    if (revealCircle == null || inventoryData == null) return;
-    if (inventoryData.revealPotions <= 0) 
-    {
-        return;
-    }
-    inventoryData.revealPotions--;
-    if (fullRevealCo != null) StopCoroutine(fullRevealCo);
-    fullRevealCo = StartCoroutine(FullRevealRoutine());
-}
 
+    public void UseRevealPotion()
+    {
+        if (revealCircle == null || inventoryData == null) return;
+        if (!inventoryData.UseRevealPotion()) return; 
+
+        RefreshInventoryUI(); 
+
+        if (fullRevealCo != null) StopCoroutine(fullRevealCo);
+        fullRevealCo = StartCoroutine(FullRevealRoutine());
+    }
+
+    public void UseHealthPotion()
+    {
+        if (inventoryData == null || playerHealth == null) return;
+        if (playerHealth.health >= playerHealth.maxHealth) return;
+
+        if (inventoryData.UseHealPotion())
+        {
+            playerHealth.Heal(healAmount);
+            RefreshInventoryUI(); 
+        }
+    }
+
+    void OnEnable()
+    {
+        if (inventoryData != null)
+            inventoryData.OnInventoryChanged += RefreshInventoryUI;
+
+        
+        RefreshInventoryUI();
+    }
+
+    void OnDisable()
+    {
+        if (inventoryData != null)
+            inventoryData.OnInventoryChanged -= RefreshInventoryUI;
+    }
+
+    private void RefreshInventoryUI()
+    {
+        if (inventoryData == null) return;
+
+        if (healText) healText.text = $"{inventoryData.healPotions}";
+        if (revealText) revealText.text = $"{inventoryData.revealPotions}";
+        if (coinsText) coinsText.text = inventoryData.coins.ToString();
+    }
 
     private IEnumerator FullRevealRoutine()
     {
@@ -476,9 +547,5 @@ public void UseRevealPotion()
 
         fullRevealCo = null;
         revealActivated = false;
+    }
 }
-
-
-
-}
-

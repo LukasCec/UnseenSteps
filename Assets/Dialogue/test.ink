@@ -3,6 +3,7 @@
 === merchant ===
 You stop at a small stall where a merchant greets you. "Hello, traveler! What do you want?"
     + [View goods]
+        #OPEN_SHOP:ELIXIRS
         -> examine
     + [Negotiate price]
         -> negotiate

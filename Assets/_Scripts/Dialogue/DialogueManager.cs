@@ -3,11 +3,9 @@ using TMPro;
 using Ink.Runtime;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine.EventSystems;
 
 public class DialogueManager : MonoBehaviour
 {
-    
     private static DialogueManager instance;
     [Header("Dialogue UI")]
     [SerializeField] private GameObject dialoguePanel;
@@ -59,7 +57,6 @@ public class DialogueManager : MonoBehaviour
         {
             return;
         }
-        // || Input.GetMouseButtonDown(0)
         if (currentStory.currentChoices.Count == 0 && Input.GetKeyDown(KeyCode.Space))
         {
             ContinueStory();
@@ -73,7 +70,6 @@ public class DialogueManager : MonoBehaviour
         dialoguePanel.SetActive(true);
 
         ContinueStory();
-
     }
 
     private IEnumerator ExitDialogueMode()
@@ -90,6 +86,10 @@ public class DialogueManager : MonoBehaviour
         if (currentStory.canContinue)
         {
             string dialogueToDisplay = currentStory.Continue();
+
+            
+            HandleTags(currentStory.currentTags);
+
             StopAllCoroutines();
             StartCoroutine(TypeDialogue(dialogueToDisplay));
             DisplayChoices();
@@ -99,8 +99,27 @@ public class DialogueManager : MonoBehaviour
             StartCoroutine(ExitDialogueMode());
         }
     }
-  
 
+    private void HandleTags(List<string> tags)
+    {
+        if (tags == null) return;
+
+        foreach (var tag in tags)
+        {
+            
+            if (tag.StartsWith("OPEN_SHOP"))
+            {
+                
+                string category = "DEFAULT";
+                var parts = tag.Split(':');
+                if (parts.Length > 1) category = parts[1];
+
+                if (ShopManager.Instance != null)
+                    ShopManager.Instance.Open(category);
+            }
+           
+        }
+    }
     private void DisplayChoices()
     {
         List<Choice> currentChoices = currentStory.currentChoices;
@@ -125,13 +144,8 @@ public class DialogueManager : MonoBehaviour
 
         StartCoroutine(SelectFirstChoice());
     }
-
-
     private IEnumerator SelectFirstChoice()
     {
-        // EventSystem.current.SetSelectedGameObject(null);
-        // yield return new WaitForEndOfFrame();
-        // EventSystem.current.SetSelectedGameObject(choices[0].gameObject);
         yield break;
     }
 
@@ -145,11 +159,9 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-
     public void MakeChoice(int ChoiceIndex)
     {
         currentStory.ChooseChoiceIndex(ChoiceIndex);
         ContinueStory();
     }
-
 }

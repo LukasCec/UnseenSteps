@@ -31,6 +31,8 @@ public class FallingTrap : MonoBehaviour
 
     void Drop()
     {
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlaySFX("spike");
         hasFallen = true;
         stalactiteRb.bodyType = RigidbodyType2D.Dynamic;
         stalactiteRb.gravityScale = 3f;

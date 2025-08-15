@@ -21,13 +21,13 @@ TagManager:
   - Enemy
   - Draggable
   - EnemyHitbox
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - BG_0
+  - BG_1
+  - BG_2
+  - BG_3
+  - BG_4
+  - BG_5
+  - BG_6
   - 
   - 
   - 
