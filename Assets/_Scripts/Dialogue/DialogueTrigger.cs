@@ -1,52 +1,93 @@
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class DialogueTrigger : MonoBehaviour
 {
-    [Header("Visual Cue")]
-    [SerializeField] private GameObject visualCue;
+    public enum TriggerMode { AutoOnEnter, PressKeyInRange }
+
+    [Header("Trigger Mode")]
+    public TriggerMode mode = TriggerMode.PressKeyInRange;
+    public KeyCode interactionKey = KeyCode.F;
+    public bool oneShot = false;
 
     [Header("Ink JSON")]
     [SerializeField] private TextAsset inkJSON;
 
-    private bool playerInRange;
+    [Header("Visual Cue (only for PressKeyInRange)")]
+    [SerializeField] private GameObject visualCueRoot; // kontajner (enable/disable)
+    [SerializeField] private TMP_Text visualCueText;    // napr. "Press F"
+    [SerializeField] private Image visualCueImage;      // ikona klávesy
+
+    [Header("Speaker (per trigger)")]
+    [SerializeField] private Sprite speakerPortrait;
+    [SerializeField] private string speakerName;
+
+    [Header("SFX (optional)")]
+    [SerializeField] private string sfxOnStart = "merchant";
+
+    private bool playerInRange = false;
+    private bool alreadyPlayed = false;
 
     private void Awake()
     {
-        playerInRange = false;  
-        visualCue.SetActive(false);
+        if (visualCueRoot) visualCueRoot.SetActive(false);
     }
 
     private void Update()
     {
-        if (playerInRange && !DialogueManager.GetInstance().dialogueIsPlaying)
+        // ak hráè nie je v dosahu, niè
+        if (!playerInRange) return;
+
+        // ak práve prebieha dialóg, nápovedu skry a nerieš input
+        if (DialogueManager.GetInstance() != null && DialogueManager.GetInstance().dialogueIsPlaying)
         {
-            visualCue.SetActive(true);
-            if (Input.GetKeyDown(KeyCode.F))
-            {
-                if (AudioManager.Instance != null)
-                    AudioManager.Instance.PlaySFX("merchant");
-                DialogueManager.GetInstance().EnterDialogueMode(inkJSON);
-            }
+            if (visualCueRoot) visualCueRoot.SetActive(false);
+            return;
         }
-        else
+
+        if (mode == TriggerMode.AutoOnEnter)
         {
-            visualCue.SetActive(false);
+            if (!alreadyPlayed || !oneShot) StartDialogue();
+        }
+        else // PressKeyInRange
+        {
+            if (visualCueRoot) visualCueRoot.SetActive(true);
+
+            if (Input.GetKeyDown(interactionKey))
+                StartDialogue();
         }
     }
 
-    private void OnTriggerEnter2D(Collider2D collider)
+    private void StartDialogue()
     {
-        if(collider.tag == "Player")
-        {
-            playerInRange= true;
+        if (inkJSON == null) return;
 
-        }
+        if (AudioManager.Instance != null && !string.IsNullOrEmpty(sfxOnStart))
+            AudioManager.Instance.PlaySFX(sfxOnStart);
+
+        DialogueManager.GetInstance()
+            .EnterDialogueMode(inkJSON, speakerPortrait, speakerName);
+
+        if (visualCueRoot) visualCueRoot.SetActive(false);
+        alreadyPlayed = true;
     }
-    private void OnTriggerExit2D(Collider2D collider)
+
+    private void OnTriggerEnter2D(Collider2D col)
     {
-        if (collider.tag == "Player")
-        {
-            playerInRange = false;
-        }
+        if (!col.CompareTag("Player")) return;
+        playerInRange = true;
+
+        // Auto režim – spusti hneï po vstupe
+        if (mode == TriggerMode.AutoOnEnter && (!alreadyPlayed || !oneShot))
+            StartDialogue();
+    }
+
+    private void OnTriggerExit2D(Collider2D col)
+    {
+        if (!col.CompareTag("Player")) return;
+        playerInRange = false;
+
+        if (visualCueRoot) visualCueRoot.SetActive(false);
     }
 }
