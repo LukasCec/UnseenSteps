@@ -29,7 +29,7 @@ RectTransform:
   m_LocalScale: {x: 1.9774904, y: 3.4606087, z: 1.9774904}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1740042320136473832}
+  m_Father: {fileID: 7557458736150186861}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -91,6 +91,39 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &4335925817338097603
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7557458736150186861}
+  m_Layer: 0
+  m_Name: VisualCue
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7557458736150186861
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4335925817338097603}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1376592066910342143}
+  - {fileID: 107850163180940898}
+  m_Father: {fileID: 1740042320136473832}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4648148680739433801
 GameObject:
   m_ObjectHideFlags: 0
@@ -121,7 +154,7 @@ RectTransform:
   m_LocalScale: {x: 0.8281989, y: 0.8281989, z: 0.8281989}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1740042320136473832}
+  m_Father: {fileID: 7557458736150186861}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -297,9 +330,8 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1621150562740609843}
-  - {fileID: 1376592066910342143}
-  - {fileID: 107850163180940898}
   - {fileID: 3987530370792682450}
+  - {fileID: 7557458736150186861}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7449496215453353778
@@ -393,8 +425,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 981263d1355b00b4ca92026babfc401f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  visualCue: {fileID: 4648148680739433801}
+  mode: 1
+  interactionKey: 102
+  oneShot: 0
   inkJSON: {fileID: 4900000, guid: f98ae7f6c35e0584f973534916241dac, type: 3}
+  visualCueRoot: {fileID: 4335925817338097603}
+  visualCueText: {fileID: 1911954998812324092}
+  visualCueImage: {fileID: 0}
+  speakerPortrait: {fileID: 1479885432632770049, guid: 688ab9aad92026442b57660cfb744e3f, type: 3}
+  speakerName: Merchant
+  sfxOnStart: merchant
 --- !u!1 &9030797841418049384
 GameObject:
   m_ObjectHideFlags: 0
