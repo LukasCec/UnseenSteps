@@ -2,55 +2,105 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 [ExecuteAlways]
 public class MaskVisibilityManager : MonoBehaviour
 {
     [Tooltip("Ak je zapnuté, objekty budú vidite¾né vo vnútri masky, inak budú ignorova masku.")]
     public bool Show = true;
 
-    [Tooltip("Zoznam objektov, ktoré sa majú prepína.")]
+    [Tooltip("Rodièovské objekty (alebo samostatné) ktorıch renderery sa majú prepnú.")]
     public List<GameObject> targetObjects = new List<GameObject>();
 
-    private void OnValidate()
+    // na detekciu zmeny v Editore (aby sme nemuseli uklada scénu)
+    private bool _lastShow;
+
+    void OnEnable()
     {
-        UpdateVisibility();
+        _lastShow = Show;
+        UpdateVisibility(true);
     }
 
-    public void UpdateVisibility()
+    void OnValidate()
     {
-        foreach (var obj in targetObjects)
-        {
-            if (obj == null) continue;
-
-            // Pre SpriteRenderer
-            SpriteRenderer sr = obj.GetComponent<SpriteRenderer>();
-            if (sr != null)
-            {
-                sr.maskInteraction = Show ? SpriteMaskInteraction.VisibleInsideMask : SpriteMaskInteraction.None;
-            }
-
-            // Pre TilemapRenderer
-            TilemapRenderer tr = obj.GetComponent<TilemapRenderer>();
-            if (tr != null)
-            {
-                tr.maskInteraction = Show ? SpriteMaskInteraction.VisibleInsideMask : SpriteMaskInteraction.None;
-            }
-        }
+        // OnValidate sa volá pri zmene v Inspectore – zareaguj hneï
+        UpdateVisibility(true);
     }
 
-    // Volanie poèas hry
-    private void Update()
+    void Update()
     {
 #if UNITY_EDITOR
-        // Aby sa to aktualizovalo aj keï meníš bool v editore
         if (!Application.isPlaying)
         {
-            UpdateVisibility();
+            // Keï sa prepne checkbox Show v Inspectore, zachytíme zmenu a refreshneme
+            if (_lastShow != Show)
+            {
+                _lastShow = Show;
+                UpdateVisibility(true);
+            }
             return;
         }
 #endif
-
-        // V runtime môeš prepnú aj cez skript alebo inspector
+        // Runtime: je to lacné, môeme refreshova priebene
         UpdateVisibility();
+    }
+
+    public void UpdateVisibility(bool forceEditorRefresh = false)
+    {
+        var mode = Show ? SpriteMaskInteraction.VisibleInsideMask : SpriteMaskInteraction.None;
+
+        foreach (var root in targetObjects)
+        {
+            if (!root) continue;
+
+            // všetky SpriteRenderery v deoch (aj neaktívnych)
+            var spriteRenderers = root.GetComponentsInChildren<SpriteRenderer>(true);
+            for (int i = 0; i < spriteRenderers.Length; i++)
+            {
+                var r = spriteRenderers[i];
+                if (r == null) continue;
+                r.maskInteraction = mode;
+
+#if UNITY_EDITOR
+                if (forceEditorRefresh)
+                    EditorUtility.SetDirty(r);
+#endif
+            }
+
+            // všetky TilemapRenderery v deoch (aj neaktívnych)
+            var tilemapRenderers = root.GetComponentsInChildren<TilemapRenderer>(true);
+            for (int i = 0; i < tilemapRenderers.Length; i++)
+            {
+                var r = tilemapRenderers[i];
+                if (r == null) continue;
+                r.maskInteraction = mode;
+
+#if UNITY_EDITOR
+                if (forceEditorRefresh)
+                    EditorUtility.SetDirty(r);
+#endif
+            }
+        }
+
+#if UNITY_EDITOR
+        if (forceEditorRefresh)
+        {
+            // nech sa hneï prekreslí SceneView/GameView
+            SceneView.RepaintAll();
+            // volite¾né: oznaè scénu ako „dirty“, aby Unity spo¾ahlivo serialize-ol zmeny bez Ctrl+S
+            // EditorSceneManager.MarkSceneDirty(gameObject.scene);
+        }
+#endif
+    }
+
+    // pravı klik na komponent -> Refresh Visibility Now
+    [ContextMenu("Refresh Visibility Now")]
+    public void RefreshNow()
+    {
+        _lastShow = Show;
+        UpdateVisibility(true);
     }
 }
