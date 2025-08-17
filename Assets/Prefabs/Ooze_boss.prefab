@@ -329,6 +329,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 50
   currentHealth: 50
+  overlayDelayAfterDeath: 3
+  unlockedSkillName: Dash Unlocked
+  unlockedSkillIcon: {fileID: 0}
+  abilitiesData: {fileID: 0}
+  unlockAbility: 1
 --- !u!114 &1233052760056809426
 MonoBehaviour:
   m_ObjectHideFlags: 0
