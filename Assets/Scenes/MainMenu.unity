@@ -1260,7 +1260,7 @@ Transform:
   m_GameObject: {fileID: 1519912270}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -94.62165, y: 8.65699, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1339,8 +1339,11 @@ MonoBehaviour:
   - name: chestOpen
     clip: {fileID: 8300000, guid: 25da4de16458a634aa1af6ef916e6357, type: 3}
     volume: 1
-  - name: chestUnlock
+  - name: doorUnlock
     clip: {fileID: 8300000, guid: e25b12c6418b04f4e99c059277437346, type: 3}
+    volume: 1
+  - name: doorLocked
+    clip: {fileID: 8300000, guid: 29831409447d00545853c2630eefa691, type: 3}
     volume: 1
 --- !u!1 &1620915920
 GameObject:

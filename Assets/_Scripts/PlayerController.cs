@@ -1,6 +1,5 @@
 using UnityEngine;
 using System.Collections;
-using TMPro;
 
 public class PlayerController : MonoBehaviour
 {
@@ -91,14 +90,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("Inventory")]
     public InventoryData inventoryData;
-    public string potionItemID = "RevealPotion";
-
-    [Header("Inventory UI (TMP)")]
-    public TMP_Text healText;
-    public TMP_Text revealText;
-    public TMP_Text coinsText;
-    public TMP_Text healCooldownText;
-    public TMP_Text revealCooldownText;
+    public InventoryManager hud;
 
     void Start()
     {
@@ -121,17 +113,19 @@ public class PlayerController : MonoBehaviour
             if (revealActivated == false && Time.time - lastRevealPotionTime >= revealPotionCooldown)
             {
                 UseRevealPotion();
+                revealActivated = true;
             }
         }
+       
         if (Input.GetKeyDown(healthPotionKey))
         {
             if (Time.time - lastHealPotionTime >= healPotionCooldown)
             {
                 UseHealthPotion();
-                lastHealPotionTime = Time.time;
             }
         }
         horizontal = Input.GetAxisRaw("Horizontal");
+        
         if (isAttacking)
         {
             horizontal = 0f;
@@ -182,8 +176,7 @@ public class PlayerController : MonoBehaviour
         {
             isAttacking = true;
             animator.SetTrigger(AnimationStrings.Attack);
-            if (AudioManager.Instance != null)
-                AudioManager.Instance.PlaySFX("playerHit");
+            PlaySfx("playerHit");
         }
 
         if (Input.GetKeyDown(KeyCode.LeftShift) && abilitiesData.canDash && !isDashing && Time.time - lastDashTime >= dashCooldown)
@@ -205,6 +198,12 @@ public class PlayerController : MonoBehaviour
 
         UnityEngine.SceneManagement.SceneManager.LoadScene(currentScene.name);
     }
+    void PlaySfx(string key)
+    {
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlaySFX(key);
+    }
+
     void FixedUpdate()
     {
 
@@ -252,8 +251,7 @@ public class PlayerController : MonoBehaviour
     void Jump()
     {
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
-        if (AudioManager.Instance != null)
-            AudioManager.Instance.PlaySFX("jump");
+        PlaySfx("jump");
         Vector3 spawnPos = groundCheck.position;
         Instantiate(jumpEffectPrefab, spawnPos, Quaternion.identity);
         currentJumpCount--;
@@ -263,8 +261,7 @@ public class PlayerController : MonoBehaviour
         canWallStick = false;
         float jumpDirection = isFacingRight() ? -1 : 1;
         rb.linearVelocity = new Vector2(wallJumpForceX * jumpDirection, wallJumpForceY);
-        if (AudioManager.Instance != null)
-            AudioManager.Instance.PlaySFX("jump");
+        PlaySfx("jump");
         isWallSliding = false;
         wallStickCounter = stickTime;
 
@@ -277,8 +274,7 @@ public class PlayerController : MonoBehaviour
         isDashing = true;
         lastDashTime = Time.time; // tu sa spust cooldown
         Instantiate(dashEffectPrefab, transform.position, Quaternion.identity);
-        if (AudioManager.Instance != null)
-            AudioManager.Instance.PlaySFX("dash");
+        PlaySfx("dash");
         float originalGravity = rb.gravityScale;
         rb.gravityScale = 0f;
         rb.linearVelocity = new Vector2(horizontal * dashSpeed, 0f);
@@ -482,9 +478,6 @@ public class PlayerController : MonoBehaviour
     {
         if (revealCircle == null || inventoryData == null) return;
         if (!inventoryData.UseRevealPotion()) return;
-
-        RefreshInventoryUI();
-
         if (fullRevealCo != null) StopCoroutine(fullRevealCo);
         fullRevealCo = StartCoroutine(FullRevealRoutine());
     }
@@ -497,32 +490,8 @@ public class PlayerController : MonoBehaviour
         if (inventoryData.UseHealPotion())
         {
             playerHealth.Heal(healAmount);
-            RefreshInventoryUI();
+            lastHealPotionTime = Time.time;
         }
-    }
-
-    void OnEnable()
-    {
-        if (inventoryData != null)
-            inventoryData.OnInventoryChanged += RefreshInventoryUI;
-
-
-        RefreshInventoryUI();
-    }
-
-    void OnDisable()
-    {
-        if (inventoryData != null)
-            inventoryData.OnInventoryChanged -= RefreshInventoryUI;
-    }
-
-    private void RefreshInventoryUI()
-    {
-        if (inventoryData == null) return;
-
-        if (healText) healText.text = $"{inventoryData.healPotions}";
-        if (revealText) revealText.text = $"{inventoryData.revealPotions}";
-        if (coinsText) coinsText.text = inventoryData.coins.ToString();
     }
 
     private IEnumerator FullRevealRoutine()
@@ -558,25 +527,13 @@ public class PlayerController : MonoBehaviour
         lastRevealPotionTime = Time.time;
         revealActivated = false;
     }
+
     private void UpdateCooldownUI()
-{
-    float healRemaining = Mathf.Max(0f, healPotionCooldown - (Time.time - lastHealPotionTime));
-    if (healCooldownText)
     {
-        if (healRemaining > 0.01f)
-            healCooldownText.text = $"{healRemaining:0.0}";
-        else
-            healCooldownText.text = "";
-    }
+        if (!hud) return;
 
-    float revealRemaining = Mathf.Max(0f, revealPotionCooldown - (Time.time - lastRevealPotionTime));
-    if (revealCooldownText)
-    {
-        if (revealRemaining > 0.01f)
-            revealCooldownText.text = $"{revealRemaining:0.0}";
-        else
-            revealCooldownText.text = "";
+        float healRemaining = Mathf.Max(0f, healPotionCooldown - (Time.time - lastHealPotionTime));
+        float revealRemaining = Mathf.Max(0f, revealPotionCooldown - (Time.time - lastRevealPotionTime));
+        hud.SetCooldowns(healRemaining, revealRemaining);
     }
-}
-
 }
