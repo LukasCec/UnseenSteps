@@ -74,25 +74,31 @@ public class PlayerController : MonoBehaviour
 
     [Header("Reveal Potion")]
     public bool revealActivated = false;
-    public CursorRevealCircle revealCircle;   
-    public float fullRevealDuration = 5f;   
-    public float fullRevealRadius = 4000f;    
-    public KeyCode revealPotionKey = KeyCode.Q; 
+    public CursorRevealCircle revealCircle;
+    public float fullRevealDuration = 5f;
+    public float fullRevealRadius = 4000f;
+    public KeyCode revealPotionKey = KeyCode.Q;
     private Coroutine fullRevealCo;
+    public float revealPotionCooldown = 5f;
+    private float lastRevealPotionTime = -Mathf.Infinity;
 
     [Header("Health Potion")]
     public KeyCode healthPotionKey = KeyCode.E;
     public int healAmount = 2;
     private PlayerHealth playerHealth;
+    public float healPotionCooldown = 3f;
+    private float lastHealPotionTime = -Mathf.Infinity;
 
     [Header("Inventory")]
-    public InventoryData inventoryData; 
+    public InventoryData inventoryData;
     public string potionItemID = "RevealPotion";
 
     [Header("Inventory UI (TMP)")]
     public TMP_Text healText;
     public TMP_Text revealText;
     public TMP_Text coinsText;
+    public TMP_Text healCooldownText;
+    public TMP_Text revealCooldownText;
 
     void Start()
     {
@@ -112,22 +118,24 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKeyDown(revealPotionKey))
         {
-            if (revealActivated == false)
+            if (revealActivated == false && Time.time - lastRevealPotionTime >= revealPotionCooldown)
             {
                 UseRevealPotion();
             }
         }
-
         if (Input.GetKeyDown(healthPotionKey))
         {
-            UseHealthPotion();
+            if (Time.time - lastHealPotionTime >= healPotionCooldown)
+            {
+                UseHealthPotion();
+                lastHealPotionTime = Time.time;
+            }
         }
-
         horizontal = Input.GetAxisRaw("Horizontal");
         if (isAttacking)
         {
             horizontal = 0f;
-            return; 
+            return;
         }
 
         if (isDragging)
@@ -188,6 +196,7 @@ public class PlayerController : MonoBehaviour
 
         WallSlideCheck();
         UpdateAnimator();
+        UpdateCooldownUI();
     }
     void ResetScene()
     {
@@ -201,10 +210,10 @@ public class PlayerController : MonoBehaviour
 
         void FixedUpdate()
         {
-            
+
             if (rb.linearVelocity.y < maxFallSpeed)
                 rb.linearVelocity = new Vector2(rb.linearVelocity.x, maxFallSpeed);
-            
+
         }
 
         if (isAttacking)
@@ -457,9 +466,9 @@ public class PlayerController : MonoBehaviour
     {
         if (currentDrag == null) return;
         bool objectOnRight = currentDrag.transform.position.x > transform.position.x;
-      
+
         if (objectOnRight && !isFacingRight()) Flip();
-       
+
         else if (!objectOnRight && isFacingRight()) Flip();
     }
 
@@ -472,9 +481,9 @@ public class PlayerController : MonoBehaviour
     public void UseRevealPotion()
     {
         if (revealCircle == null || inventoryData == null) return;
-        if (!inventoryData.UseRevealPotion()) return; 
+        if (!inventoryData.UseRevealPotion()) return;
 
-        RefreshInventoryUI(); 
+        RefreshInventoryUI();
 
         if (fullRevealCo != null) StopCoroutine(fullRevealCo);
         fullRevealCo = StartCoroutine(FullRevealRoutine());
@@ -488,7 +497,7 @@ public class PlayerController : MonoBehaviour
         if (inventoryData.UseHealPotion())
         {
             playerHealth.Heal(healAmount);
-            RefreshInventoryUI(); 
+            RefreshInventoryUI();
         }
     }
 
@@ -497,7 +506,7 @@ public class PlayerController : MonoBehaviour
         if (inventoryData != null)
             inventoryData.OnInventoryChanged += RefreshInventoryUI;
 
-        
+
         RefreshInventoryUI();
     }
 
@@ -546,6 +555,28 @@ public class PlayerController : MonoBehaviour
         revealCircle.revealRadius = originalRadius;
 
         fullRevealCo = null;
+        lastRevealPotionTime = Time.time;
         revealActivated = false;
     }
+    private void UpdateCooldownUI()
+{
+    float healRemaining = Mathf.Max(0f, healPotionCooldown - (Time.time - lastHealPotionTime));
+    if (healCooldownText)
+    {
+        if (healRemaining > 0.01f)
+            healCooldownText.text = $"{healRemaining:0.0}";
+        else
+            healCooldownText.text = "";
+    }
+
+    float revealRemaining = Mathf.Max(0f, revealPotionCooldown - (Time.time - lastRevealPotionTime));
+    if (revealCooldownText)
+    {
+        if (revealRemaining > 0.01f)
+            revealCooldownText.text = $"{revealRemaining:0.0}";
+        else
+            revealCooldownText.text = "";
+    }
+}
+
 }
