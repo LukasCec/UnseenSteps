@@ -5,14 +5,18 @@ using UnityEngine.SceneManagement;
 public class PlayerHealth : MonoBehaviour, IDamageable
 {
     [Header("Health")]
-    public int maxHealth = 5;    
-    public int health = 5;        
+    public int maxHealth = 5;
+    public int health = 5;
 
     private SpriteRenderer sr;
 
     [Header("Knockback")]
     public float knockbackForce = 10f;
     private PlayerController controller;
+
+    [Header("Invulnerability")]
+    public float invulnerabilityDuration = 2f;  // Ëas, poËas ktorÈho hr·Ë nemÙûe dostaù damage
+    private bool isInvulnerable = false;
 
     void Start()
     {
@@ -26,7 +30,7 @@ public class PlayerHealth : MonoBehaviour, IDamageable
 
     public void TakeDamage(int dmg, Vector2 attackerPosition)
     {
-        if (health <= 0) return;
+        if (health <= 0 || isInvulnerable) return;
 
         if (AudioManager.Instance != null)
             AudioManager.Instance.PlaySFX("enemyHit");
@@ -40,7 +44,7 @@ public class PlayerHealth : MonoBehaviour, IDamageable
         rb.linearVelocity = Vector2.zero;
         rb.AddForce(knockDirection * knockbackForce, ForceMode2D.Impulse);
 
-        StartCoroutine(BlinkEffect());
+        StartCoroutine(DamageRoutine());
 
         if (health <= 0)
         {
@@ -49,7 +53,7 @@ public class PlayerHealth : MonoBehaviour, IDamageable
             SceneManager.LoadScene(currentScene.name);
         }
     }
-    
+
     public void Heal(int amount)
     {
         if (amount <= 0 || health <= 0) return;
@@ -63,10 +67,22 @@ public class PlayerHealth : MonoBehaviour, IDamageable
         }
     }
 
+    IEnumerator DamageRoutine()
+    {
+        isInvulnerable = true;
+
+       
+        yield return StartCoroutine(BlinkEffect());
+
+        yield return new WaitForSeconds(invulnerabilityDuration);
+
+        isInvulnerable = false;
+    }
+
     IEnumerator BlinkEffect()
     {
-        int blinkCount = 3;
-        float blinkDuration = 0.1f;
+        int blinkCount = 6;
+        float blinkDuration = 0.15f;
 
         for (int i = 0; i < blinkCount; i++)
         {
