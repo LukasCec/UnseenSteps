@@ -1,87 +1,49 @@
 using UnityEngine;
-using System;
+using TMPro;
 
-[CreateAssetMenu(fileName = "InventoryData", menuName = "Game/Inventory Data")]
-public class InventoryData : ScriptableObject
+public class InventoryManager : MonoBehaviour
 {
-    [Header("Inventory")]
-    public int healPotions;
-    public int revealPotions;
-    public int coins;
+    [Header("Refs")]
+    public InventoryData inventoryData;
 
-    public event Action OnInventoryChanged;
-    private void RaiseChanged() => OnInventoryChanged?.Invoke();
+    [Header("Texts")]
+    public TMP_Text healText;
+    public TMP_Text revealText;
+    public TMP_Text coinsText;
+    public TMP_Text keysText;
 
-   
-    public void AddHealPotion(int amount = 1)
+    [Header("Cooldown Texts")]
+    public TMP_Text healCooldownText;
+    public TMP_Text revealCooldownText;
+
+    void OnEnable()
     {
-        if (AudioManager.Instance != null)
-            AudioManager.Instance.PlaySFX("item");
-        healPotions = Mathf.Max(0, healPotions + amount);
-        RaiseChanged();
+        if (inventoryData != null)
+            inventoryData.OnInventoryChanged += UpdateCounts;
+        UpdateCounts();
+        SetCooldowns(0, 0);
     }
 
-    public void AddRevealPotion(int amount = 1)
+    void OnDisable()
     {
-        if (AudioManager.Instance != null)
-            AudioManager.Instance.PlaySFX("item");
-        revealPotions = Mathf.Max(0, revealPotions + amount);
-        RaiseChanged();
+        if (inventoryData != null)
+            inventoryData.OnInventoryChanged -= UpdateCounts;
     }
 
-    public void AddCoins(int amount = 1)
+    public void UpdateCounts()
     {
-        if (AudioManager.Instance != null)
-            AudioManager.Instance.PlaySFX("coin");
-        coins = Mathf.Max(0, coins + amount);
-        RaiseChanged();
+        if (!inventoryData) return;
+        if (healText) healText.text = $"{inventoryData.healPotions}";
+        if (revealText) revealText.text = $"{inventoryData.revealPotions}";
+        if (coinsText) coinsText.text = inventoryData.coins.ToString();
+        if (keysText) keysText.text = inventoryData.keys.ToString();
     }
 
-    
-    public bool UseHealPotion()
+    public void SetCooldowns(float healSeconds, float revealSeconds)
     {
-        if (healPotions > 0)
-        {
-            healPotions--;
-            RaiseChanged();
-            return true;
-        }
-        return false;
+        if (healCooldownText)
+            healCooldownText.text = healSeconds > 0.05f ? $"{healSeconds:0.0}s" : "";
+        if (revealCooldownText)
+            revealCooldownText.text = revealSeconds > 0.05f ? $"{revealSeconds:0.0}s" : "";
     }
-
-    public bool UseRevealPotion()
-    {
-        if (revealPotions > 0)
-        {
-            revealPotions--;
-            RaiseChanged();
-            if (AudioManager.Instance != null)
-                AudioManager.Instance.PlaySFX("reveal");
-            return true;
-        }
-        return false;
-    }
-
-    public bool SpendCoins(int amount)
-    {
-        if (coins >= amount)
-        {
-            coins -= amount;
-            RaiseChanged();
-            return true;
-        }
-        return false;
-    }
-
-    public void ResetInventory()
-    {
-        healPotions = 0;
-        revealPotions = 0;
-        coins = 0;
-        RaiseChanged();
-    }
-
-#if UNITY_EDITOR
-    private void OnValidate() { RaiseChanged(); } // aj pri zmene v Inspectore (Play)
-#endif
 }
