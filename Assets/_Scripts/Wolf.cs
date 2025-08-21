@@ -1,34 +1,69 @@
 using UnityEngine;
+using System.Collections;
 
 [RequireComponent(typeof(EnemyWalk))]
 [RequireComponent(typeof(EnemyHealth))]
 [RequireComponent(typeof(Rigidbody2D))]
 public class Wolf : MonoBehaviour
 {
+    [Header("Ranges")]
+    [Tooltip("Ak je hrï¿½ï¿½ bliï¿½ï¿½ie neï¿½ toto, vlk zaï¿½ne nahï¿½ï¿½aï¿½.")]
+    public float detectionRange = 6f;
+    [Tooltip("Ak je hrï¿½ï¿½ bliï¿½ï¿½ie neï¿½ toto, vlk spustï¿½ ï¿½tok.")]
+    public float attackRange = 1.3f;
+    [Tooltip("Vzdialenosï¿½, pri ktorej vlk prestane ï¿½sï¿½ do hrï¿½ï¿½a (aby sa nelepili). Ak je 0, berie sa 0.8 * attackRange.")]
+    public float stoppingDistance = 0f;
+
+    [Header("Chase")]
+    [Tooltip("Nï¿½sobiï¿½ rï¿½chlosti pri nahï¿½ï¿½anï¿½ (1 = rovnakï¿½ ako patrol).")]
+    public float chaseSpeedMultiplier = 1.2f;
+    [Tooltip("Cooldown medzi flipmi, aby sa rï¿½chlo nepreklï¿½pal.")]
+    public float flipCooldown = 0.4f;
+
+    [Header("Combat")]
+    public float attackCooldown = 0.9f;
+    [Tooltip("Vrstva hrï¿½ï¿½a (pre fallback damage).")]
+    public LayerMask playerLayer;
+    [Tooltip("Pouï¿½ije sa iba ak hitbox nemï¿½ EnemyAttackHitbox komponent.")]
+    public int fallbackDamage = 1;
+
     [Header("Attack Hitbox (child with BoxCollider2D)")]
-    [Tooltip("Sem hoï odkaz na collider, ktorı má by zapínanı poèas útoku.")]
+    [Tooltip("Collider zapï¿½nanï¿½ poï¿½as ï¿½toku (isTrigger = true).")]
     public BoxCollider2D hitboxCollider;
 
     private Animator animator;
     private Rigidbody2D rb;
     private EnemyWalk enemyWalk;
+    private Transform player;
 
     private bool isAttacking = false;
+    private bool canAttack = true;
+    private float lastFlipTime = -999f;
 
     void Awake()
     {
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
         enemyWalk = GetComponent<EnemyWalk>();
+        player = GameObject.FindWithTag("Player")?.transform;
 
-        // istota: hitbox je defaultne vypnutı
         if (hitboxCollider != null)
             hitboxCollider.enabled = false;
+
+        if (stoppingDistance <= 0f)
+            stoppingDistance = attackRange * 0.8f; // aby sa neprilepil do hrï¿½ï¿½a
     }
 
     void FixedUpdate()
     {
-        // Poèas útoku zastavíme horizontálny pohyb a vypneme chôdzu
+        if (player == null)
+        {
+            // Bez hrï¿½ï¿½a ï¿½ len patrol
+            enemyWalk.enabled = true;
+            animator.SetBool("isMoving", Mathf.Abs(rb.linearVelocity.x) > 0.01f);
+            return;
+        }
+
         if (isAttacking)
         {
             if (enemyWalk.enabled) enemyWalk.enabled = false;
@@ -37,16 +72,98 @@ public class Wolf : MonoBehaviour
             return;
         }
 
-        // mimo útoku nech sa správa normálne (patroluje cez EnemyWalk)
-        if (!enemyWalk.enabled) enemyWalk.enabled = true;
+        float dist = Vector2.Distance(transform.position, player.position);
 
-        // jednoduchı prepínaè idle/run pod¾a rıchlosti
-        bool moving = Mathf.Abs(rb.linearVelocity.x) > 0.01f;
-        animator.SetBool("isMoving", moving);
+        // --- Attack ---
+        if (dist <= attackRange && canAttack && HasLineOfSight())
+        {
+            StartCoroutine(AttackRoutine());
+            return;
+        }
+
+        // --- Chase ---
+        if (dist <= detectionRange && HasLineOfSight())
+        {
+            if (enemyWalk.enabled) enemyWalk.enabled = false;
+
+            LookAtPlayer();
+
+            float dx = player.position.x - transform.position.x;
+            float absDx = Mathf.Abs(dx);
+
+            // Ak sme uï¿½ dosï¿½ blï¿½zko, zastav sa (nech sa nelepi do hrï¿½ï¿½a)
+            if (absDx <= stoppingDistance)
+            {
+                rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+                animator.SetBool("isMoving", false);
+            }
+            else
+            {
+                float dir = Mathf.Sign(dx);
+                float speed = enemyWalk.moveSpeed * Mathf.Max(0.01f, chaseSpeedMultiplier);
+                rb.linearVelocity = new Vector2(dir * speed, rb.linearVelocity.y);
+                animator.SetBool("isMoving", true);
+            }
+        }
+        else
+        {
+            // --- Patrol ---
+            if (!enemyWalk.enabled) enemyWalk.enabled = true;
+            animator.SetBool("isMoving", Mathf.Abs(rb.linearVelocity.x) > 0.01f);
+        }
+    }
+
+    // --- Line of Sight: stena medzi vlkom a hrï¿½ï¿½om? (pouï¿½ij groundLayer z EnemyWalk) ---
+    bool HasLineOfSight()
+    {
+        if (player == null) return false;
+
+        Vector2 origin = transform.position;
+        Vector2 dir = (player.position - transform.position).normalized;
+        float distance = Vector2.Distance(origin, player.position);
+
+        // ak ray narazï¿½ na zem/stenu, hrï¿½ï¿½ je skrytï¿½
+        RaycastHit2D hit = Physics2D.Raycast(origin, dir, distance, enemyWalk.groundLayer);
+        return hit.collider == null;
+    }
+
+    // --- Flip smerom k hrï¿½ï¿½ovi s cooldownom ---
+    void LookAtPlayer()
+    {
+        float xDiff = player.position.x - transform.position.x;
+        if (Mathf.Abs(xDiff) < 0.05f) return;
+        if (Time.time - lastFlipTime < flipCooldown) return;
+
+        bool playerOnRight = xDiff > 0f;
+        bool facingRight = enemyWalk.isFacingRight;
+
+        if ((playerOnRight && !facingRight) || (!playerOnRight && facingRight))
+        {
+            enemyWalk.Flip();
+            lastFlipTime = Time.time;
+        }
+    }
+
+    IEnumerator AttackRoutine()
+    {
+        isAttacking = true;
+        canAttack = false;
+
+        if (enemyWalk.enabled) enemyWalk.enabled = false;
+        rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+        animator.SetBool("isMoving", false);
+
+        // Spusï¿½ ï¿½toï¿½nï¿½ trigger (vloï¿½ï¿½ Animation Events: EnableHitbox / DisableHitbox)
+        animator.SetTrigger("Attack");
+
+        yield return new WaitForSeconds(attackCooldown);
+        // Pozn.: cooldown je odï¿½tartovanï¿½ od zaï¿½iatku animï¿½cie (jednoduchï¿½ie ladenie)
+        isAttacking = false;
+        canAttack = true;
     }
 
     /// <summary>
-    /// Zavolaj z Animation Event v útoènej animácii na frame, keï má hitbox zaèa bra.
+    /// Zavolaj z Animation Event v ï¿½toï¿½nej animï¿½cii na frame, keï¿½ mï¿½ hitbox zaï¿½aï¿½ braï¿½.
     /// </summary>
     public void EnableHitbox()
     {
@@ -54,29 +171,97 @@ public class Wolf : MonoBehaviour
 
         if (hitboxCollider != null)
         {
-            // ak má na sebe EnemyAttackHitbox, otvor damage okno
+            // Primï¿½rne: EnemyAttackHitbox komponent riadi damage okno
             var dealer = hitboxCollider.GetComponent<EnemyAttackHitbox>();
-            if (dealer != null) dealer.BeginWindow();
-
-            hitboxCollider.enabled = true;
-            //Debug.Log("[Wolf] Hitbox ENABLED");
+            if (dealer != null)
+            {
+                hitboxCollider.enabled = true;
+                dealer.BeginWindow();
+            }
+            else
+            {
+                // Fallback damage ï¿½ pre prï¿½pad, ï¿½e nemï¿½ EnemyAttackHitbox.
+                // Prebehni hrï¿½ï¿½a v dosahu hitboxu a rovno mu daj damage.
+                hitboxCollider.enabled = true; // nech sa dï¿½ vizuï¿½lne debuggovaï¿½/trafiï¿½
+                DoFallbackDamage();
+            }
         }
     }
 
     /// <summary>
-    /// Zavolaj z Animation Event v útoènej animácii, keï má hitbox presta bra.
+    /// Zavolaj z Animation Event v ï¿½toï¿½nej animï¿½cii, keï¿½ mï¿½ hitbox prestaï¿½ braï¿½.
     /// </summary>
     public void DisableHitbox()
     {
         if (hitboxCollider != null)
         {
             var dealer = hitboxCollider.GetComponent<EnemyAttackHitbox>();
-            if (dealer != null) dealer.EndWindow();
-
-            hitboxCollider.enabled = false;
-            //Debug.Log("[Wolf] Hitbox DISABLED");
+            if (dealer != null)
+            {
+                dealer.EndWindow();
+                hitboxCollider.enabled = false;
+            }
+            else
+            {
+                // vypneme a skonï¿½ï¿½ fallback okno
+                hitboxCollider.enabled = false;
+            }
         }
 
+        // ï¿½tok dobehol, AI mï¿½ï¿½e pokraï¿½ovaï¿½
         isAttacking = false;
+    }
+
+    // --- Fallback damage ak nemï¿½ EnemyAttackHitbox na hitboxe ---
+    void DoFallbackDamage()
+    {
+        // Vezmeme stred a polomer z hitboxu a trafï¿½me 1 hrï¿½ï¿½a
+        Vector2 center = hitboxCollider.bounds.center;
+        float radius = Mathf.Max(hitboxCollider.bounds.extents.x, hitboxCollider.bounds.extents.y);
+
+        Collider2D target = Physics2D.OverlapCircle(center, radius, playerLayer);
+        if (target != null)
+        {
+            var ph = target.GetComponent<PlayerHealth>();
+            if (ph != null)
+            {
+                ph.TakeDamage(fallbackDamage);
+            }
+        }
+    }
+
+    // --- Debug vizualizï¿½cia ---
+    void OnDrawGizmosSelected()
+    {
+        // detection range (ï¿½ltï¿½) + attack range (ï¿½ervenï¿½) + stopping (oranï¿½ovï¿½)
+        Gizmos.color = new Color(1f, 0.9f, 0.2f, 0.9f);
+        Gizmos.DrawWireSphere(transform.position, detectionRange);
+
+        Gizmos.color = new Color(1f, 0.2f, 0.2f, 0.9f);
+        Gizmos.DrawWireSphere(transform.position, attackRange);
+
+        Gizmos.color = new Color(1f, 0.6f, 0.2f, 0.9f);
+        Gizmos.DrawWireSphere(transform.position, stoppingDistance > 0 ? stoppingDistance : attackRange * 0.8f);
+
+        // LOS ï¿½iara (len v playmode a keï¿½ mï¿½me referencie)
+        if (player != null)
+        {
+            Gizmos.color = HasLineOfSight() ? Color.cyan : new Color(0.3f, 0.3f, 0.3f, 0.8f);
+            Gizmos.DrawLine(transform.position, player.position);
+        }
+
+        // vizuï¿½l hitboxu (ak existuje)
+        if (hitboxCollider != null)
+        {
+            Gizmos.color = new Color(0.2f, 0.8f, 1f, 0.5f);
+            Gizmos.DrawWireCube(hitboxCollider.bounds.center, hitboxCollider.bounds.size);
+        }
+    }
+
+    void OnValidate()
+    {
+        detectionRange = Mathf.Max(0f, detectionRange);
+        attackRange = Mathf.Max(0.1f, attackRange);
+        if (stoppingDistance <= 0f) stoppingDistance = attackRange * 0.8f;
     }
 }
