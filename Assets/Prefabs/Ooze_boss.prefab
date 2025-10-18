@@ -250,7 +250,7 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3792219732634468930}
-  m_BodyType: 0
+  m_BodyType: 1
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
@@ -327,12 +327,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb36b78c0b96dfa4b851c00a82f3cd1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 50
-  currentHealth: 50
+  maxHealth: 10
+  currentHealth: 10
   overlayDelayAfterDeath: 3
-  unlockedSkillName: Dash Unlocked
-  unlockedSkillIcon: {fileID: 0}
-  abilitiesData: {fileID: 0}
+  unlockedSkillName: Dash
+  unlockedSkillIcon: {fileID: 21300000, guid: 42410bb809a8b6a428e1262585ab83b6, type: 3}
+  abilitiesData: {fileID: 11400000, guid: f809fcae436c87949bdb76ac6c7ed229, type: 2}
   unlockAbility: 1
 --- !u!114 &1233052760056809426
 MonoBehaviour:

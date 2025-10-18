@@ -339,8 +339,8 @@ MonoBehaviour:
   spawnPoint: {fileID: 7754975573722836379}
   dropForceMin: {x: -2, y: 5}
   dropForceMax: {x: 2, y: 7}
-  itemPrefab: {fileID: 0}
-  dropItem: 0
+  itemPrefab: {fileID: 5830315522499572566, guid: 1a6b8182e4519884d8164b541d1d267c, type: 3}
+  dropItem: 1
   tooltipUI: {fileID: 2106905263676682541}
   openDelay: 0.6
 --- !u!61 &1179157930320731254
