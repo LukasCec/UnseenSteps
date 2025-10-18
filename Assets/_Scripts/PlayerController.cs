@@ -62,6 +62,7 @@ public class PlayerController : MonoBehaviour
     [Header("VFX")]
     public GameObject dashEffectPrefab;
     public GameObject jumpEffectPrefab;
+    public GameObject healEffectPrefab;
     public bool isStunned = false;
     public int damage = 1;
 
@@ -491,6 +492,27 @@ public class PlayerController : MonoBehaviour
         {
             playerHealth.Heal(healAmount);
             lastHealPotionTime = Time.time;
+
+            // Spustenie efektu healu iba teraz
+            if (healEffectPrefab != null)
+            {
+                var fx = Instantiate(
+                    healEffectPrefab,
+                    transform.position + Vector3.up * 0.1f,
+                    Quaternion.identity
+                    //transform // nech sa to „vezie“ s hráčom
+                );
+
+                // explicitne pustíme particle (keď je Play On Awake OFF)
+                var ps = fx.GetComponent<ParticleSystem>();
+                if (ps != null)
+                {
+                    var main = ps.main;
+                    main.stopAction = ParticleSystemStopAction.Destroy;
+
+                    ps.Play(true);
+                }
+            }
         }
     }
 
