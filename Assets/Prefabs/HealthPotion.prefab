@@ -29,7 +29,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -102.25, y: 8.91, z: 0}
-  m_LocalScale: {x: 2, y: 2, z: 2}
+  m_LocalScale: {x: 2.7248, y: 2.7248, z: 2.7248}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
@@ -150,7 +150,6 @@ MonoBehaviour:
   itemType: 0
   amount: 1
   inventoryData: {fileID: 11400000, guid: d0228b304b1f70d4ab362803a4034233, type: 2}
-  healText: {fileID: 0}
-  revealText: {fileID: 0}
-  coinsText: {fileID: 0}
   pickupEffectPrefab: {fileID: 0}
+  floatAmplitude: 0.25
+  floatFrequency: 1
