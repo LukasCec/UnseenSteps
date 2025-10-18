@@ -204,6 +204,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 8
   jumpForce: 15
+  maxFallSpeed: -25
   maxJumpCount: 2
   currentJumpCount: 0
   dashSpeed: 20
@@ -232,12 +233,24 @@ MonoBehaviour:
   attackHitbox: {fileID: 8028199543541507529}
   dashEffectPrefab: {fileID: 5513733649221406610, guid: fe66811b132d02f46900a2e4f1d515d8, type: 3}
   jumpEffectPrefab: {fileID: 6463334891485378783, guid: d9d9a49421c54364e9dbe648b62109c4, type: 3}
+  healEffectPrefab: {fileID: 2280450132527623783, guid: badaedee7ffeafc42953580912b4d442, type: 3}
   isStunned: 0
   damage: 1
   groundAndDragLayer:
     serializedVersion: 2
     m_Bits: 0
   abilitiesData: {fileID: 11400000, guid: f809fcae436c87949bdb76ac6c7ed229, type: 2}
+  revealActivated: 0
+  revealCircle: {fileID: 0}
+  fullRevealDuration: 5
+  fullRevealRadius: 4000
+  revealPotionKey: 113
+  revealPotionCooldown: 5
+  healthPotionKey: 101
+  healAmount: 2
+  healPotionCooldown: 3
+  inventoryData: {fileID: 0}
+  hud: {fileID: 0}
 --- !u!95 &565232495284404144
 Animator:
   serializedVersion: 7
@@ -272,8 +285,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9c6c171b8c7bfe14ca5456f4304bcf11, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  maxHealth: 5
   health: 5
   knockbackForce: 10
+  invulnerabilityDuration: 2
 --- !u!1 &6095939309536450333
 GameObject:
   m_ObjectHideFlags: 0
