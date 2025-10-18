@@ -11,7 +11,7 @@ public class InventoryData : ScriptableObject
     public int keys;
 
     public event Action OnInventoryChanged;
-    private void RaiseChanged() => OnInventoryChanged?.Invoke();
+    public void RaiseChanged() => OnInventoryChanged?.Invoke();
 
     public void AddHealPotion(int amount = 1)
     {

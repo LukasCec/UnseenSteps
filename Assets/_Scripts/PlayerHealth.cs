@@ -1,6 +1,5 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class PlayerHealth : MonoBehaviour, IDamageable
 {
@@ -48,9 +47,8 @@ public class PlayerHealth : MonoBehaviour, IDamageable
 
         if (health <= 0)
         {
-            Debug.Log("Player dead!");
-            Scene currentScene = SceneManager.GetActiveScene();
-            SceneManager.LoadScene(currentScene.name);
+            if (CheckpointManager.Instance != null)
+                CheckpointManager.Instance.RespawnPlayer();
         }
     }
 
