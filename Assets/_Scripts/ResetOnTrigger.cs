@@ -14,7 +14,8 @@ public class ResetOnTrigger : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            if (CheckpointManager.Instance != null)
+                CheckpointManager.Instance.RespawnPlayer();
         }
     }
 }
