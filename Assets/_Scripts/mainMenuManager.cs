@@ -6,7 +6,7 @@ public class MainMenuManager : MonoBehaviour
 {
     [Header("Scene To Load")]
     [Tooltip("N·zov alebo index scÈny, ktor· sa m· spustiù po Play.")]
-    public string playSceneName = "Level1";
+    public string playSceneName = "GameDaysScene";
     public int playSceneIndex = -1;
 
     [Header("Optional: Fade/Loading")]

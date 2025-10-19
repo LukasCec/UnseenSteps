@@ -286,8 +286,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a6e769db3228f854e8f016001eab6af2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playSceneName: Level_1
-  playSceneIndex: 1
+  playSceneName: GameDaysScene
+  playSceneIndex: 3
   fadeAnimator: {fileID: 0}
   fadeDuration: 0.5
 --- !u!4 &720929997
@@ -1344,6 +1344,9 @@ MonoBehaviour:
     volume: 1
   - name: doorLocked
     clip: {fileID: 8300000, guid: 29831409447d00545853c2630eefa691, type: 3}
+    volume: 1
+  - name: checkpoint
+    clip: {fileID: 8300000, guid: b84686d3bbc838445b1591dfeeb846ba, type: 3}
     volume: 1
 --- !u!1 &1620915920
 GameObject:
