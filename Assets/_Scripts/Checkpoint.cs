@@ -58,6 +58,7 @@ public class Checkpoint : MonoBehaviour
     }
 
     void OnTriggerEnter2D(Collider2D c) { if (c.CompareTag("Player")) playerInRange = true; }
+    void OnTriggerStay2D(Collider2D c) { if (c.CompareTag("Player")) playerInRange = true; }
     void OnTriggerExit2D(Collider2D c) { if (c.CompareTag("Player")) playerInRange = false; }
 
     public Vector3 SpawnPos => (spawnPoint ? spawnPoint.position : transform.position);
