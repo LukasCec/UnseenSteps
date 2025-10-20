@@ -156,7 +156,7 @@ public class PlayerController : MonoBehaviour
         if (horizontal > 0 && !isFacingRight()) Flip();
         else if (horizontal < 0 && isFacingRight()) Flip();
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.W))
         {
             if ((isWallSliding || isTouchingWall) && abilitiesData.canWallJump)
             {
