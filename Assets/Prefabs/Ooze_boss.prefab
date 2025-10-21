@@ -250,14 +250,14 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3792219732634468930}
-  m_BodyType: 1
+  m_BodyType: 0
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 1
   m_LinearDamping: 0
   m_AngularDamping: 0.05
-  m_GravityScale: 1
+  m_GravityScale: 3
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -267,7 +267,7 @@ Rigidbody2D:
     m_Bits: 0
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 4
 --- !u!61 &4285634956433084076
 BoxCollider2D:
@@ -347,8 +347,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 2
-  detectionRange: 14.7
-  attackRange: 2.51
+  detectionRange: 100
+  attackRange: 2.5
   attackCooldown: 2
   attackOrigin: {fileID: 1556387422125217389}
   meleeHitbox: {fileID: 7287754881395350033}
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  edgeLookAhead: 0.5
+  edgeRayDown: 1
+  wallCheckDistance: 0.2
