@@ -440,10 +440,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6197a8fe05980bb458771fe166ec5f8b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spawnPoint: {fileID: 0}
-  tooltipUI: {fileID: 0}
-  interactKey: 99
-  animator: {fileID: 0}
+  spawnPoint: {fileID: 6042233043023394395}
+  tooltipUI: {fileID: 3313721256122097270}
+  interactKey: 102
+  animator: {fileID: 5044764657450428196}
   activateTrigger: Activate
 --- !u!1 &6929296310850304878
 GameObject:
