@@ -1348,6 +1348,9 @@ MonoBehaviour:
   - name: checkpoint
     clip: {fileID: 8300000, guid: b84686d3bbc838445b1591dfeeb846ba, type: 3}
     volume: 1
+  - name: enemyExplode
+    clip: {fileID: 8300000, guid: 07a98be2169586e4280bda7c911b9465, type: 3}
+    volume: 1
 --- !u!1 &1620915920
 GameObject:
   m_ObjectHideFlags: 0
