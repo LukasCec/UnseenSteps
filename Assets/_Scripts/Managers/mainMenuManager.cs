@@ -5,9 +5,9 @@ using UnityEngine.SceneManagement;
 public class MainMenuManager : MonoBehaviour
 {
     [Header("Scene To Load")]
-    [Tooltip("Názov alebo index scény, ktorá sa má spusti po Play.")]
+    [Tooltip("Nï¿½zov alebo index scï¿½ny, ktorï¿½ sa mï¿½ spustiï¿½ po Play.")]
     public string playSceneName = "GameDaysScene";
-    public int playSceneIndex = -1;
+    public int playSceneIndex = 3;
 
     [Header("Optional: Fade/Loading")]
     public Animator fadeAnimator;          

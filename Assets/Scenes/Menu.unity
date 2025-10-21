@@ -1096,8 +1096,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Play
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 397561b148e9afd4ebbf03079a451778, type: 2}
-  m_sharedMaterial: {fileID: -2898725810384609825, guid: 397561b148e9afd4ebbf03079a451778, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1325,8 +1325,8 @@ MonoBehaviour:
 
 '
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 397561b148e9afd4ebbf03079a451778, type: 2}
-  m_sharedMaterial: {fileID: -2898725810384609825, guid: 397561b148e9afd4ebbf03079a451778, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1859,8 +1859,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Unseen Steps
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 397561b148e9afd4ebbf03079a451778, type: 2}
-  m_sharedMaterial: {fileID: -2898725810384609825, guid: 397561b148e9afd4ebbf03079a451778, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -2538,8 +2538,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a6e769db3228f854e8f016001eab6af2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playSceneName: Level1
-  playSceneIndex: -1
+  playSceneName: GameDaysScene
+  playSceneIndex: 1
   fadeAnimator: {fileID: 0}
   fadeDuration: 0.5
 --- !u!1 &832705633
@@ -3177,8 +3177,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Settings
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 397561b148e9afd4ebbf03079a451778, type: 2}
-  m_sharedMaterial: {fileID: -2898725810384609825, guid: 397561b148e9afd4ebbf03079a451778, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
