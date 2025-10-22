@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class CheckpointManager : MonoBehaviour
 {
@@ -12,14 +13,17 @@ public class CheckpointManager : MonoBehaviour
     Vector3 lastCheckpointPos;
     bool hasCheckpoint;
 
-    InventorySnap invSnap;
-    AbilitiesSnap abilSnap;
+    InventorySnap checkpointInv;
+    AbilitiesSnap checkpointAbil;
+
+    bool pendingRespawn;
 
     void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
         DontDestroyOnLoad(gameObject);
+        LoadFromPrefs(); // dôležité
     }
 
     public void SaveCheckpoint(Checkpoint cp)
@@ -28,40 +32,111 @@ public class CheckpointManager : MonoBehaviour
         lastCheckpointPos = cp.SpawnPos;
         hasCheckpoint = true;
 
-        invSnap = InventorySnap.From(inventory);
-        abilSnap = AbilitiesSnap.From(abilities);
+        checkpointInv = InventorySnap.From(inventory);
+        checkpointAbil = AbilitiesSnap.From(abilities);
+
+        SaveToPrefs();
     }
 
     public void RespawnPlayer()
     {
-        if (!player) player = FindObjectOfType<PlayerController>();
-        if (!player)
-            return;
-
         if (!hasCheckpoint)
         {
-            // fallback: ak neexistuje checkpoint, urob to èo doteraz (reload scény)
-            var s = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
-            UnityEngine.SceneManagement.SceneManager.LoadScene(s.name);
+            var s = SceneManager.GetActiveScene();
+            SceneManager.LoadScene(s.name);
             return;
         }
 
-        // presun + reset rýchlosti
-        player.transform.position = lastCheckpointPos;
-        var rb = player.GetComponent<Rigidbody2D>();
-        if (rb) rb.linearVelocity = Vector2.zero;
+        pendingRespawn = true;
+        SceneManager.sceneLoaded += OnSceneLoaded;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name); // soft reset levelu
+    }
 
-        // obnova inventára + schopností
-        invSnap.ApplyTo(inventory);
-        abilSnap.ApplyTo(abilities);
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (!pendingRespawn) return;
+        SceneManager.sceneLoaded -= OnSceneLoaded;
 
-        // (odporúèané) doplò HP
-        var ph = player.GetComponent<PlayerHealth>();
+        // nájdi nového hráèa po reloade
+        player = FindObjectOfType<PlayerController>();
+
+        if (player)
+        {
+            player.transform.position = lastCheckpointPos;
+            var rb = player.GetComponent<Rigidbody2D>();
+#if UNITY_6000_0_OR_NEWER
+            if (rb) rb.linearVelocity = Vector2.zero;
+#else
+            if (rb) rb.velocity = Vector2.zero;
+#endif
+        }
+
+        // nastav inventár + skilly na STAV z checkpointu
+        checkpointInv.ApplyTo(inventory);
+        checkpointAbil.ApplyTo(abilities);
+
+        // doplò HP
+        var ph = player ? player.GetComponent<PlayerHealth>() : null;
         if (ph) ph.health = ph.maxHealth;
 
-        if (AudioManager.Instance != null)
-            AudioManager.Instance.PlaySFX("checkpoint");
-        Toast.Show("You got one more chance");
+        pendingRespawn = false;
+
+        AudioManager.Instance?.PlaySFX("checkpoint");
+        Toast.Show("Respawn pri checkpointe");
+    }
+
+    // ----------------- persist do PlayerPrefs -----------------
+    const string K_HAS = "CP_Has";
+    const string K_X = "CP_X", K_Y = "CP_Y", K_Z = "CP_Z";
+    const string K_HEAL = "CP_Heal", K_REVEAL = "CP_Reveal", K_COINS = "CP_Coins", K_KEYS = "CP_Keys";
+    const string K_DJ = "CP_DJ", K_DASH = "CP_Dash", K_WJ = "CP_WJ", K_WS = "CP_WS";
+
+    void SaveToPrefs()
+    {
+        PlayerPrefs.SetInt(K_HAS, hasCheckpoint ? 1 : 0);
+        PlayerPrefs.SetFloat(K_X, lastCheckpointPos.x);
+        PlayerPrefs.SetFloat(K_Y, lastCheckpointPos.y);
+        PlayerPrefs.SetFloat(K_Z, lastCheckpointPos.z);
+
+        PlayerPrefs.SetInt(K_HEAL, checkpointInv.heal);
+        PlayerPrefs.SetInt(K_REVEAL, checkpointInv.reveal);
+        PlayerPrefs.SetInt(K_COINS, checkpointInv.coins);
+        PlayerPrefs.SetInt(K_KEYS, checkpointInv.keys);
+
+        PlayerPrefs.SetInt(K_DJ, checkpointAbil.dj ? 1 : 0);
+        PlayerPrefs.SetInt(K_DASH, checkpointAbil.dash ? 1 : 0);
+        PlayerPrefs.SetInt(K_WJ, checkpointAbil.wj ? 1 : 0);
+        PlayerPrefs.SetInt(K_WS, checkpointAbil.ws ? 1 : 0);
+
+        PlayerPrefs.Save();
+    }
+
+    void LoadFromPrefs()
+    {
+        hasCheckpoint = PlayerPrefs.GetInt(K_HAS, 0) == 1;
+        if (!hasCheckpoint) return;
+
+        lastCheckpointPos = new Vector3(
+            PlayerPrefs.GetFloat(K_X, 0),
+            PlayerPrefs.GetFloat(K_Y, 0),
+            PlayerPrefs.GetFloat(K_Z, 0)
+        );
+
+        checkpointInv = new InventorySnap
+        {
+            heal = PlayerPrefs.GetInt(K_HEAL, 0),
+            reveal = PlayerPrefs.GetInt(K_REVEAL, 0),
+            coins = PlayerPrefs.GetInt(K_COINS, 0),
+            keys = PlayerPrefs.GetInt(K_KEYS, 0),
+        };
+
+        checkpointAbil = new AbilitiesSnap
+        {
+            dj = PlayerPrefs.GetInt(K_DJ, 0) == 1,
+            dash = PlayerPrefs.GetInt(K_DASH, 0) == 1,
+            wj = PlayerPrefs.GetInt(K_WJ, 0) == 1,
+            ws = PlayerPrefs.GetInt(K_WS, 0) == 1,
+        };
     }
 
     // ------- Snapshots --------
@@ -69,18 +144,16 @@ public class CheckpointManager : MonoBehaviour
     struct InventorySnap
     {
         public int heal, reveal, coins, keys;
-
         public static InventorySnap From(InventoryData d)
         {
-            InventorySnap s = new InventorySnap();
-            if (!d) return s;
-            s.heal = d.healPotions;
-            s.reveal = d.revealPotions;
-            s.coins = d.coins;
-            s.keys = d.keys;           // ak máš Keys v InventoryData
-            return s;
+            return new InventorySnap
+            {
+                heal = d ? d.healPotions : 0,
+                reveal = d ? d.revealPotions : 0,
+                coins = d ? d.coins : 0,
+                keys = d ? d.keys : 0
+            };
         }
-
         public void ApplyTo(InventoryData d)
         {
             if (!d) return;
@@ -88,7 +161,7 @@ public class CheckpointManager : MonoBehaviour
             d.revealPotions = reveal;
             d.coins = coins;
             d.keys = keys;
-            d.RaiseChanged(); // viï malú úpravu InventoryData nižšie
+            d.RaiseChanged(); // refresh UI
         }
     }
 
@@ -96,16 +169,15 @@ public class CheckpointManager : MonoBehaviour
     struct AbilitiesSnap
     {
         public bool dj, dash, wj, ws;
-
         public static AbilitiesSnap From(PlayerAbilitiesData a)
         {
-            AbilitiesSnap s = new AbilitiesSnap();
-            if (!a) return s;
-            s.dj = a.canDoubleJump;
-            s.dash = a.canDash;
-            s.wj = a.canWallJump;
-            s.ws = a.canWallSlide;
-            return s;
+            return new AbilitiesSnap
+            {
+                dj = a && a.canDoubleJump,
+                dash = a && a.canDash,
+                wj = a && a.canWallJump,
+                ws = a && a.canWallSlide
+            };
         }
         public void ApplyTo(PlayerAbilitiesData a)
         {
