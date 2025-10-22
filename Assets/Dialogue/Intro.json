@@ -1,0 +1,1 @@
+﻿{"inkVersion":21,"root":[[{"->":"start"},["done",{"#f":5,"#n":"g-0"}],null],"done",{"start":["^Ahhhhh, I slept so good today...","\n",{"->":"next"},{"#f":1}],"next":["^whats that sound???","\n","#","^SPAWN_PORTAL","/#","end",{"#f":1}],"#f":1}],"listDefs":{}}

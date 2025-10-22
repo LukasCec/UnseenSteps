@@ -181,7 +181,11 @@ public class DialogueManager : MonoBehaviour
                 if (ShopManager.Instance != null)
                     ShopManager.Instance.Open(category);
             }
-            // tu môžeš doplniť ďalšie tagy (napr. SET_PORTRAIT:ID, SET_NAME:Unknown, ...)
+            else if (tag.Trim() == "SPAWN_PORTAL")
+            {
+                var spawner = GameObject.FindObjectOfType<PortalSpawner>();
+                if (spawner != null) spawner.Spawn();
+            }
         }
     }
 
