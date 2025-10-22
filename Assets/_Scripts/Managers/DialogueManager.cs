@@ -4,6 +4,7 @@ using Ink.Runtime;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class DialogueManager : MonoBehaviour
 {
@@ -185,6 +186,16 @@ public class DialogueManager : MonoBehaviour
             {
                 var spawner = GameObject.FindObjectOfType<PortalSpawner>();
                 if (spawner != null) spawner.Spawn();
+            }
+            else if (tag.StartsWith("LOAD_SCENE:"))
+            {
+                var parts = tag.Split(':');
+                if (parts.Length > 1)
+                {
+                    string sceneName = parts[1].Trim();
+                    if (!string.IsNullOrEmpty(sceneName))
+                        SceneManager.LoadScene(sceneName);
+                }
             }
         }
     }

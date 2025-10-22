@@ -89,7 +89,7 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
+  m_MaskInteraction: 1
   m_SpriteSortPoint: 0
 --- !u!1 &3313721256122097270
 GameObject:
@@ -194,7 +194,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: C
+  m_text: F
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 397561b148e9afd4ebbf03079a451778, type: 2}
   m_sharedMaterial: {fileID: -2898725810384609825, guid: 397561b148e9afd4ebbf03079a451778, type: 2}
@@ -296,7 +296,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5235523801028046727}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -58.5136, y: -5.938248, z: 0.06219833}
   m_LocalScale: {x: 1.5126, y: 1.5126, z: 1.5126}
   m_ConstrainProportionsScale: 0
@@ -358,7 +358,7 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
+  m_MaskInteraction: 1
   m_SpriteSortPoint: 0
 --- !u!95 &5044764657450428196
 Animator:
