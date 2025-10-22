@@ -18,7 +18,20 @@ public class AudioManager : MonoBehaviour
     {
         if (Instance != null) { Destroy(gameObject); return; }
         Instance = this;
-        DontDestroyOnLoad(gameObject);
+
+        // Nájdeme alebo vytvoríme DDOL kontajner
+        var ddol = GameObject.Find("/_Managers");
+        if (ddol == null)
+        {
+            ddol = new GameObject("_Managers");
+            DontDestroyOnLoad(ddol);
+        }
+        else
+        {
+            DontDestroyOnLoad(ddol);
+        }
+
+        transform.SetParent(ddol.transform, worldPositionStays: true);
 
         if (!musicSource) musicSource = gameObject.AddComponent<AudioSource>();
         if (!sfxSource) sfxSource = gameObject.AddComponent<AudioSource>();
