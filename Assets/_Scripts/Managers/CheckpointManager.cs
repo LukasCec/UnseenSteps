@@ -188,4 +188,30 @@ public class CheckpointManager : MonoBehaviour
             a.canWallSlide = ws;
         }
     }
+
+    public static void ClearSavedCheckpoint()
+    {
+        // tie isté k¾úèe, ktoré už používaš
+        PlayerPrefs.DeleteKey("CP_Has");
+        PlayerPrefs.DeleteKey("CP_X");
+        PlayerPrefs.DeleteKey("CP_Y");
+        PlayerPrefs.DeleteKey("CP_Z");
+        PlayerPrefs.DeleteKey("CP_Heal");
+        PlayerPrefs.DeleteKey("CP_Reveal");
+        PlayerPrefs.DeleteKey("CP_Coins");
+        PlayerPrefs.DeleteKey("CP_Keys");
+        PlayerPrefs.DeleteKey("CP_DJ");
+        PlayerPrefs.DeleteKey("CP_Dash");
+        PlayerPrefs.DeleteKey("CP_WJ");
+        PlayerPrefs.DeleteKey("CP_WS");
+        PlayerPrefs.Save();
+
+        // vymaž aj runtime stav
+        if (Instance != null)
+        {
+            Instance.hasCheckpoint = false;
+            Instance.lastCheckpointPos = Vector3.zero;
+        }
+    }
+
 }

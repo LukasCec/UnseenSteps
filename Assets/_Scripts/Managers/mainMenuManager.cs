@@ -22,6 +22,7 @@ public class MainMenuManager : MonoBehaviour
     public void OnPlayPressed()
     {
         PlayClick();
+        CheckpointManager.ClearSavedCheckpoint();
         StartCoroutine(LoadGame());
     }
 
