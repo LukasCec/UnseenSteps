@@ -489,6 +489,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2676458052818138497, guid: e1bc1507638bb5a4eadf109a3520e4fe, type: 3}
+      propertyPath: m_MaskInteraction
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 8651098197995318093, guid: e1bc1507638bb5a4eadf109a3520e4fe, type: 3}
       propertyPath: m_Name
       value: EnemyShooter
@@ -3200,6 +3204,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 207427459}
     m_Modifications:
+    - target: {fileID: 3526648447228463449, guid: 72b1ba13b4572d74e9982bec8e681a00, type: 3}
+      propertyPath: m_MaskInteraction
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 6608046094593357362, guid: 72b1ba13b4572d74e9982bec8e681a00, type: 3}
       propertyPath: m_Name
       value: Wolf
@@ -4915,15 +4923,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.03396219, g: 0.03396219, b: 0.03396219, a: 0.44313726}
+  m_Color: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
+  m_Sprite: {fileID: 2868539044483428322, guid: 844679b4e742a954f8c798a8fa5aa5f2, type: 3}
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -6416,6 +6424,14 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2834365773685452004, guid: 92262467000ef5045b4f443f0b5dab81, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2834365773685452004, guid: 92262467000ef5045b4f443f0b5dab81, type: 3}
+      propertyPath: m_MaskInteraction
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 3698002109502231032, guid: 92262467000ef5045b4f443f0b5dab81, type: 3}
       propertyPath: m_Name
       value: EnemyNinja
@@ -6463,6 +6479,14 @@ PrefabInstance:
     - target: {fileID: 5460205173843558891, guid: 92262467000ef5045b4f443f0b5dab81, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5947402401100077331, guid: 92262467000ef5045b4f443f0b5dab81, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8349802213606024783, guid: 92262467000ef5045b4f443f0b5dab81, type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8349802213606024783, guid: 92262467000ef5045b4f443f0b5dab81, type: 3}
       propertyPath: isFacingRight
