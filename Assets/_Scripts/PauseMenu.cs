@@ -1,19 +1,21 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 
 public class PauseMenu : MonoBehaviour
 {
     public static PauseMenu Instance;
-
     public static bool IsPaused { get; private set; }
 
     [Header("UI")]
-    [Tooltip("Root canvas/panel pauzovacieho menu")]
     public CanvasGroup pauseCanvas;
+
+    [Header("Overlays to close on ESC")]
+    public GameObject dialoguePanel;   
+    public GameObject shopPanel;       
 
     [Header("Settings")]
     public KeyCode toggleKey = KeyCode.Escape;
-    [Tooltip("N·zov scÈny s hlavn˝m menu")]
     public string mainMenuSceneName = "MainMenu";
 
     bool isPaused = false;
@@ -22,23 +24,32 @@ public class PauseMenu : MonoBehaviour
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
-        HideInstant(); // na ötarte nech nie je vidieù
+        HideInstant();
     }
 
     void Update()
     {
         if (Input.GetKeyDown(toggleKey))
         {
-            ShopManager.Instance?.Close();
+            if (CloseOverlays()) return;
             Toggle();
         }
     }
 
-    public void Toggle()
+    bool CloseOverlays()
     {
-        if (isPaused) Resume();
-        else Pause();
+        bool closed = false;
+
+         var dm = DialogueManager.GetInstance();
+        if (dm != null && dm.CloseIfOpen()) closed = true;
+
+         if (ShopManager.Instance != null && ShopManager.Instance.CloseIfOpen())
+            closed = true;
+
+        return closed;
     }
+
+    public void Toggle() { if (isPaused) Resume(); else Pause(); }
 
     public void Pause()
     {
@@ -57,8 +68,13 @@ public class PauseMenu : MonoBehaviour
     {
         isPaused = false;
         IsPaused = false;
+
         Time.timeScale = 1f;
         HideInstant();
+
+        // dÙleûitÈ: vyËisti v˝ber a osy po UI
+        EventSystem.current?.SetSelectedGameObject(null);
+        Input.ResetInputAxes();
     }
 
     void HideInstant()
@@ -74,14 +90,15 @@ public class PauseMenu : MonoBehaviour
     void PlayClick()
     {
         if (AudioManager.Instance != null)
-            AudioManager.Instance.PlaySFX("buttonClick");  // n·zov musÌ sedieù v AudioManager.sfx
+            AudioManager.Instance.PlaySFX("buttonClick");
     }
 
     // ---- Button hooks ----
-
     public void OnContinuePressed()
     {
         PlayClick();
+        EventSystem.current?.SetSelectedGameObject(null);
+        Input.ResetInputAxes();
         Resume();
     }
 

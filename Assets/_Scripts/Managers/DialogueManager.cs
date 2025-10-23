@@ -174,6 +174,35 @@ public class DialogueManager : MonoBehaviour
             StartCoroutine(ExitDialogueMode());
         }
     }
+    public void ForceClose()
+    {
+        StopAllCoroutines();
+        dialogueIsPlaying = false;
+
+        if (dialoguePanel) dialoguePanel.SetActive(false);
+        if (dialogueText) dialogueText.text = "";
+
+        // vypni choices
+        if (choices != null)
+            for (int i = 0; i < choices.Length; i++)
+                if (choices[i]) choices[i].SetActive(false);
+
+        // skry speaker prvky
+        SetSpeakerSprite(null);
+        SetSpeakerTexture(null);
+        SetSpeakerName(null);
+    }
+
+    public bool CloseIfOpen()
+    {
+        // otvorený je buď keď beží dialóg, alebo keď je panel aktívny
+        if (dialogueIsPlaying || (dialoguePanel && dialoguePanel.activeInHierarchy))
+        {
+            ForceClose();
+            return true;
+        }
+        return false;
+    }
 
     private void HandleTags(List<string> tags)
     {

@@ -13,19 +13,13 @@ public class ShopManager : MonoBehaviour
     [Header("Prices")]
     public int healPrice = 10;
     public int revealPrice = 15;
+    public bool IsOpen => shopPanel != null && shopPanel.activeInHierarchy;
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Backspace))
-        {
-            Close();
-        }
-    }
     void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
-        shopPanel.SetActive(false);
+        if (shopPanel != null) shopPanel.SetActive(false);
     }
 
     void OnEnable()
@@ -40,15 +34,25 @@ public class ShopManager : MonoBehaviour
             inventory.OnInventoryChanged -= Refresh;
     }
 
-    public void Open(string category = "ELIXIRS")
+    public bool CloseIfOpen()
     {
-        shopPanel.SetActive(true);
-        Refresh();
+        if (IsOpen)
+        {
+            Close();
+            return true;
+        }
+        return false;
     }
 
     public void Close()
     {
-        shopPanel.SetActive(false);
+        if (shopPanel != null) shopPanel.SetActive(false);
+    }
+
+    public void Open(string category = "ELIXIRS")
+    {
+        shopPanel.SetActive(true);
+        Refresh();
     }
 
     public void BuyHeal()

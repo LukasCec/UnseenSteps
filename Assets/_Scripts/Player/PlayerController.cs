@@ -104,7 +104,7 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        if (PauseMenu.IsPaused) return;
+        if (PauseMenu.IsPaused) return;  
 
         if (Input.GetKeyDown(revealPotionKey))
         {
@@ -198,6 +198,7 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (PauseMenu.IsPaused) return;
 
         void FixedUpdate()
         {

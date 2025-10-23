@@ -24,15 +24,29 @@ public class PlayerHealth : MonoBehaviour, IDamageable
 
         health = Mathf.Clamp(health, 0, maxHealth);
     }
+    public void GrantTempInvulnerabilityRealtime(float seconds)
+    {
+        StopCoroutine(nameof(_TempInvulRt));
+        StartCoroutine(_TempInvulRt(seconds));
+    }
+
+    IEnumerator _TempInvulRt(float seconds)
+    {
+        isInvulnerable = true;
+        yield return new WaitForSecondsRealtime(seconds);
+        isInvulnerable = false;
+    }
 
     public void TakeDamage(int dmg) => TakeDamage(dmg, transform.position);
 
     public void TakeDamage(int dmg, Vector2 attackerPosition)
     {
+        if (PauseMenu.IsPaused) return;
         if (health <= 0 || isInvulnerable) return;
 
         if (AudioManager.Instance != null)
             AudioManager.Instance.PlaySFX("enemyHit");
+
         health = Mathf.Clamp(health - dmg, 0, maxHealth);
         Debug.Log("Player hit! HP: " + health);
 
