@@ -70,7 +70,7 @@ public class DialogueManager : MonoBehaviour
         if (!dialogueIsPlaying) return;
 
         // pokračuj medzerou, len ak nie sú k dispozícii choices
-        if (currentStory.currentChoices.Count == 0 && Input.GetKeyDown(KeyCode.Space))
+        if (currentStory.currentChoices.Count == 0 && (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Escape)))
         {
             ContinueStory();
         }
@@ -151,8 +151,19 @@ public class DialogueManager : MonoBehaviour
         {
             string line = currentStory.Continue();
 
-            // tagy (napr. OPEN_SHOP:ALCHEMY)
+            // Handle any tags first (they may be paired with blank lines)
             HandleTags(currentStory.currentTags);
+
+            // NEW: skip whitespace-only lines
+            if (string.IsNullOrWhiteSpace(line))
+            {
+                // Try to continue again (until we hit a non-empty line or end)
+                ContinueStory();
+                return;
+            }
+
+            // (Optional) trim trailing newlines so TMP doesn’t add extra spacing
+            line = line.TrimEnd('\r', '\n');
 
             StopAllCoroutines();
             StartCoroutine(TypeDialogue(line));
