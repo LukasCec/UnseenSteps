@@ -106,11 +106,6 @@ public class PlayerController : MonoBehaviour
     {
         if (PauseMenu.IsPaused) return;
 
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            ResetScene();
-        }
-
         if (Input.GetKeyDown(revealPotionKey))
         {
             if (revealActivated == false && Time.time - lastRevealPotionTime >= revealPotionCooldown)
@@ -194,13 +189,7 @@ public class PlayerController : MonoBehaviour
         UpdateAnimator();
         UpdateCooldownUI();
     }
-    void ResetScene()
-    {
-        UnityEngine.SceneManagement.Scene currentScene =
-            UnityEngine.SceneManagement.SceneManager.GetActiveScene();
 
-        UnityEngine.SceneManagement.SceneManager.LoadScene(currentScene.name);
-    }
     void PlaySfx(string key)
     {
         if (AudioManager.Instance != null)
