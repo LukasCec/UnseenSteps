@@ -104,6 +104,8 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (PauseMenu.IsPaused) return;
+
         if (Input.GetKeyDown(KeyCode.R))
         {
             ResetScene();

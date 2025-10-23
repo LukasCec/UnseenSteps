@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class CheckpointManager : MonoBehaviour
 {
@@ -17,13 +18,22 @@ public class CheckpointManager : MonoBehaviour
     AbilitiesSnap checkpointAbil;
 
     bool pendingRespawn;
+    Vector3 defaultSpawnPos;
 
     void Awake()
     {
-        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+        if (Instance != null && Instance != this)
+        {
+            Debug.LogWarning("[CheckpointManager] Duplicate detected. Destroying this one.");
+            Destroy(gameObject);
+            return;
+        }
         Instance = this;
         DontDestroyOnLoad(gameObject);
-        LoadFromPrefs(); // dÙleûitÈ
+
+        LoadFromPrefs();
+        CaptureDefaultSpawnIfNeeded();
+        Debug.Log("[CheckpointManager] Alive id=" + GetInstanceID());
     }
 
     public void SaveCheckpoint(Checkpoint cp)
@@ -38,24 +48,17 @@ public class CheckpointManager : MonoBehaviour
         SaveToPrefs();
     }
 
-    public void RespawnPlayer()
-    {
-        if (!hasCheckpoint)
-        {
-            var s = SceneManager.GetActiveScene();
-            SceneManager.LoadScene(s.name);
-            return;
-        }
-
-        pendingRespawn = true;
-        SceneManager.sceneLoaded += OnSceneLoaded;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name); // soft reset levelu
-    }
-
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         if (!pendingRespawn) return;
         SceneManager.sceneLoaded -= OnSceneLoaded;
+
+        StartCoroutine(RespawnAfterLoad());
+    }
+
+    IEnumerator RespawnAfterLoad()
+    {
+        yield return null;
 
         // n·jdi novÈho hr·Ëa po reloade
         player = FindObjectOfType<PlayerController>();
@@ -63,15 +66,16 @@ public class CheckpointManager : MonoBehaviour
         if (player)
         {
             player.transform.position = lastCheckpointPos;
+
             var rb = player.GetComponent<Rigidbody2D>();
 #if UNITY_6000_0_OR_NEWER
             if (rb) rb.linearVelocity = Vector2.zero;
 #else
-            if (rb) rb.velocity = Vector2.zero;
+        if (rb) rb.velocity = Vector2.zero;
 #endif
         }
 
-        // nastav invent·r + skilly na STAV z checkpointu
+        // obnov invent·r/ability zo snapshotu
         checkpointInv.ApplyTo(inventory);
         checkpointAbil.ApplyTo(abilities);
 
@@ -82,7 +86,7 @@ public class CheckpointManager : MonoBehaviour
         pendingRespawn = false;
 
         AudioManager.Instance?.PlaySFX("checkpoint");
-        Toast.Show("Respawn pri checkpointe");
+        Toast.Show("Respawn");
     }
 
     // ----------------- persist do PlayerPrefs -----------------
@@ -137,6 +141,13 @@ public class CheckpointManager : MonoBehaviour
             wj = PlayerPrefs.GetInt(K_WJ, 0) == 1,
             ws = PlayerPrefs.GetInt(K_WS, 0) == 1,
         };
+    }
+
+    void CaptureDefaultSpawnIfNeeded()
+    {
+        if (!player) player = FindObjectOfType<PlayerController>();
+        if (player && defaultSpawnPos == Vector3.zero)
+            defaultSpawnPos = player.transform.position;
     }
 
     // ------- Snapshots --------
@@ -214,4 +225,62 @@ public class CheckpointManager : MonoBehaviour
         }
     }
 
+    public void RespawnAtCheckpoint()
+    {
+        CaptureDefaultSpawnIfNeeded();
+
+        if (!player) { Debug.LogWarning("Respawn: player not found"); return; }
+
+        // vyber cieæ ñ checkpoint, alebo poËiatoËn˝ spawn
+        Vector3 targetPos = hasCheckpoint ? lastCheckpointPos : defaultSpawnPos;
+
+        player.transform.position = targetPos;
+
+        var rb = player.GetComponent<Rigidbody2D>();
+#if UNITY_6000_0_OR_NEWER
+        if (rb) rb.linearVelocity = Vector2.zero;
+#else
+    if (rb) rb.velocity = Vector2.zero;
+#endif
+
+        // d·ta: ak m·me checkpoint, obnov snapshoty; inak nemeÚ niË
+        if (hasCheckpoint)
+        {
+            checkpointInv.ApplyTo(inventory);
+            checkpointAbil.ApplyTo(abilities);
+        }
+
+        // HP doplniù vûdy
+        var ph = player.GetComponent<PlayerHealth>();
+        if (ph) ph.health = ph.maxHealth;
+
+        AudioManager.Instance?.PlaySFX("checkpoint");
+        Toast.Show(hasCheckpoint ? "Respawned" : "You  died");
+    }
+
+    public void RestartLevel(bool fullReset = true)
+    {
+        if (fullReset)
+        {
+            ClearSavedCheckpoint();
+            ResetDataToDefaults();
+        }
+
+        var s = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+        SceneManager.LoadScene(s.name);
+    }
+
+    void ResetDataToDefaults()
+    {
+        // Invent·r
+        if (inventory) inventory.ResetInventory();
+        // Schopnosti
+        if (abilities)
+        {
+            abilities.canDoubleJump = false;
+            abilities.canDash = false;
+            abilities.canWallJump = false;
+            abilities.canWallSlide = false;
+        }
+    }
 }

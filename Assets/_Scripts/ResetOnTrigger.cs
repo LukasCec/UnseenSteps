@@ -15,7 +15,7 @@ public class ResetOnTrigger : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             if (CheckpointManager.Instance != null)
-                CheckpointManager.Instance.RespawnPlayer();
+                CheckpointManager.Instance.RespawnAtCheckpoint();
         }
     }
 }

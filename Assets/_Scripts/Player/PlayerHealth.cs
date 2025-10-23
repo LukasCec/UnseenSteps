@@ -48,7 +48,7 @@ public class PlayerHealth : MonoBehaviour, IDamageable
         if (health <= 0)
         {
             if (CheckpointManager.Instance != null)
-                CheckpointManager.Instance.RespawnPlayer();
+                CheckpointManager.Instance.RespawnAtCheckpoint();
         }
     }
 
