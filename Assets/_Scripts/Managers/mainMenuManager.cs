@@ -79,10 +79,4 @@ public class MainMenuManager : MonoBehaviour
         if (AudioManager.Instance != null)
             AudioManager.Instance.PlaySFX("buttonClick");
     }
- 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Escape))
-            OnExitPressed();
-    }
 }
