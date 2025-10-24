@@ -1,11 +1,12 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Reflection;
 
 public class CheckpointManager : MonoBehaviour
 {
     public static CheckpointManager Instance { get; private set; }
 
-    [Header("Refs (rovnaké, ako používa hráè)")]
+    [Header("Refs (rovnaké, ako používa hráč)")]
     public PlayerController player;
     public InventoryData inventory;
     public PlayerAbilitiesData abilities;
@@ -16,16 +17,27 @@ public class CheckpointManager : MonoBehaviour
     InventorySnap checkpointInv;
     AbilitiesSnap checkpointAbil;
 
-    bool pendingRespawn;
+    // flagy pre správy a typ reloadu
+    bool pendingRespawn;              // respawn s checkpointom
+    bool pendingDiedNoCheckpoint;     // smrť bez checkpointu
+    bool pendingMenuRestart;          // tichý reload z menu
+
+    // --- PlayerPrefs keys ---
+    const string K_HAS = "CP_Has";
+    const string K_X = "CP_X", K_Y = "CP_Y", K_Z = "CP_Z";
+    const string K_HEAL = "CP_Heal", K_REVEAL = "CP_Reveal", K_COINS = "CP_Coins", K_KEYS = "CP_Keys";
+    const string K_DJ = "CP_DJ", K_DASH = "CP_Dash", K_WJ = "CP_WJ", K_WS = "CP_WS";
 
     void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
         DontDestroyOnLoad(gameObject);
-        LoadFromPrefs(); // dôležité
+        LoadFromPrefs();
     }
 
+    // Uloženie checkpointu (bez snapshotu scény – itemy sa vždy respawnú)
+    [System.Obsolete]
     public void SaveCheckpoint(Checkpoint cp)
     {
         if (!player) player = FindObjectOfType<PlayerController>();
@@ -38,28 +50,71 @@ public class CheckpointManager : MonoBehaviour
         SaveToPrefs();
     }
 
+    // Smrť → respawn / reload
+    [System.Obsolete]
     public void RespawnPlayer()
     {
+        var active = SceneManager.GetActiveScene();
+
         if (!hasCheckpoint)
         {
-            var s = SceneManager.GetActiveScene();
-            SceneManager.LoadScene(s.name);
+            // Smrť bez checkpointu → čistý reload + vynulovať SO dáta
+            ResetDataToDefaults();
+            pendingDiedNoCheckpoint = true;
+            SceneManager.sceneLoaded += OnSceneLoaded;
+            SceneManager.LoadScene(active.name);
             return;
         }
 
+        // Máme checkpoint → reloadni scénu, potom aplikuj snapshoty
         pendingRespawn = true;
         SceneManager.sceneLoaded += OnSceneLoaded;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name); // soft reset levelu
+        SceneManager.LoadScene(active.name);
     }
 
+    // Restart z menu
+    [System.Obsolete]
+    public void RestartLevel(bool fullReset = true)
+    {
+        if (fullReset)
+        {
+            ResetDataToDefaults();
+            ClearSavedCheckpoint();
+        }
+
+        pendingMenuRestart = true;
+        var s = SceneManager.GetActiveScene();
+        SceneManager.sceneLoaded += OnSceneLoaded;
+        SceneManager.LoadScene(s.name);
+    }
+
+    // --- Scene callback ---
+    [System.Obsolete]
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        if (!pendingRespawn) return;
         SceneManager.sceneLoaded -= OnSceneLoaded;
 
-        // nájdi nového hráèa po reloade
-        player = FindObjectOfType<PlayerController>();
+        // tichý reload z menu
+        if (pendingMenuRestart)
+        {
+            pendingMenuRestart = false;
+            return;
+        }
 
+        // po čistom reloade bez CP: len „You died“
+        if (pendingDiedNoCheckpoint)
+        {
+            pendingDiedNoCheckpoint = false;
+            Toast.Show("You  died");
+            return;
+        }
+
+        // respawn s checkpointom
+        if (!pendingRespawn) return;
+        pendingRespawn = false;
+
+        // nájdi hráča
+        player = FindObjectOfType<PlayerController>();
         if (player)
         {
             player.transform.position = lastCheckpointPos;
@@ -71,26 +126,22 @@ public class CheckpointManager : MonoBehaviour
 #endif
         }
 
-        // nastav inventár + skilly na STAV z checkpointu
+        // obnova inventára + schopností
         checkpointInv.ApplyTo(inventory);
         checkpointAbil.ApplyTo(abilities);
 
-        // doplò HP
+        // doplň HP
         var ph = player ? player.GetComponent<PlayerHealth>() : null;
         if (ph) ph.health = ph.maxHealth;
 
-        pendingRespawn = false;
+        // aktivuj posledný checkpoint (aby nezobrazoval F)
+        ForceActivateCheckpointAt(lastCheckpointPos);
 
         AudioManager.Instance?.PlaySFX("checkpoint");
         Toast.Show("Respawned");
     }
 
-    // ----------------- persist do PlayerPrefs -----------------
-    const string K_HAS = "CP_Has";
-    const string K_X = "CP_X", K_Y = "CP_Y", K_Z = "CP_Z";
-    const string K_HEAL = "CP_Heal", K_REVEAL = "CP_Reveal", K_COINS = "CP_Coins", K_KEYS = "CP_Keys";
-    const string K_DJ = "CP_DJ", K_DASH = "CP_Dash", K_WJ = "CP_WJ", K_WS = "CP_WS";
-
+    // ---------- Persist ----------
     void SaveToPrefs()
     {
         PlayerPrefs.SetInt(K_HAS, hasCheckpoint ? 1 : 0);
@@ -109,17 +160,6 @@ public class CheckpointManager : MonoBehaviour
         PlayerPrefs.SetInt(K_WS, checkpointAbil.ws ? 1 : 0);
 
         PlayerPrefs.Save();
-    }
-     public void RestartLevel(bool fullReset = true)
-    {
-        if (fullReset)
-        {
-            ResetDataToDefaults();
-            ClearSavedCheckpoint();
-        }
-
-        var s = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
-        SceneManager.LoadScene(s.name);
     }
 
     void LoadFromPrefs()
@@ -150,7 +190,45 @@ public class CheckpointManager : MonoBehaviour
         };
     }
 
-    // ------- Snapshots -------- 
+    public static void ClearSavedCheckpoint()
+    {
+        PlayerPrefs.DeleteKey("CP_Has");
+        PlayerPrefs.DeleteKey("CP_X");
+        PlayerPrefs.DeleteKey("CP_Y");
+        PlayerPrefs.DeleteKey("CP_Z");
+        PlayerPrefs.DeleteKey("CP_Heal");
+        PlayerPrefs.DeleteKey("CP_Reveal");
+        PlayerPrefs.DeleteKey("CP_Coins");
+        PlayerPrefs.DeleteKey("CP_Keys");
+        PlayerPrefs.DeleteKey("CP_DJ");
+        PlayerPrefs.DeleteKey("CP_Dash");
+        PlayerPrefs.DeleteKey("CP_WJ");
+        PlayerPrefs.DeleteKey("CP_WS");
+        // starý kľúč pre snapshot ignorujeme, ale môžeme ho tiež zmazať, ak existuje:
+        PlayerPrefs.DeleteKey("CP_PresentIdsV1");
+        PlayerPrefs.DeleteKey("CP_PresentIdsV2");
+        PlayerPrefs.Save();
+
+        if (Instance != null)
+        {
+            Instance.hasCheckpoint = false;
+            Instance.lastCheckpointPos = Vector3.zero;
+        }
+    }
+
+    void ResetDataToDefaults()
+    {
+        if (inventory) inventory.ResetInventory();
+        if (abilities)
+        {
+            abilities.canDoubleJump = false;
+            abilities.canDash = false;
+            abilities.canWallJump = false;
+            abilities.canWallSlide = false;
+        }
+    }
+
+    // ---------- Snapshots (len inventár/ability) ----------
     [System.Serializable]
     struct InventorySnap
     {
@@ -200,42 +278,32 @@ public class CheckpointManager : MonoBehaviour
         }
     }
 
-    public static void ClearSavedCheckpoint()
+    // ---------- Pomocné ----------
+    [System.Obsolete]
+    void ForceActivateCheckpointAt(Vector3 pos)
     {
-        // tie isté k¾úèe, ktoré už používaš
-        PlayerPrefs.DeleteKey("CP_Has");
-        PlayerPrefs.DeleteKey("CP_X");
-        PlayerPrefs.DeleteKey("CP_Y");
-        PlayerPrefs.DeleteKey("CP_Z");
-        PlayerPrefs.DeleteKey("CP_Heal");
-        PlayerPrefs.DeleteKey("CP_Reveal");
-        PlayerPrefs.DeleteKey("CP_Coins");
-        PlayerPrefs.DeleteKey("CP_Keys");
-        PlayerPrefs.DeleteKey("CP_DJ");
-        PlayerPrefs.DeleteKey("CP_Dash");
-        PlayerPrefs.DeleteKey("CP_WJ");
-        PlayerPrefs.DeleteKey("CP_WS");
-        PlayerPrefs.Save();
+        var cps = FindObjectsOfType<Checkpoint>(true);
+        if (cps == null || cps.Length == 0) return;
 
-        // vymaž aj runtime stav
-        if (Instance != null)
+        Checkpoint best = null;
+        float bestD = float.MaxValue;
+        foreach (var cp in cps)
         {
-            Instance.hasCheckpoint = false;
-            Instance.lastCheckpointPos = Vector3.zero;
+            var p = cp != null ? cp.SpawnPos : cp.transform.position;
+            float d = (p - pos).sqrMagnitude;
+            if (d < bestD) { bestD = d; best = cp; }
         }
-    }
-    void ResetDataToDefaults()
-    {
-        // Invent�r
-        if (inventory) inventory.ResetInventory();
-        // Schopnosti
-        if (abilities)
-        {
-            abilities.canDoubleJump = false;
-            abilities.canDash = false;
-            abilities.canWallJump = false;
-            abilities.canWallSlide = false;
-        }
-    }
+        if (best == null) return;
 
+        try
+        {
+            if (best.tooltipUI) best.tooltipUI.SetActive(false);
+            if (best.animator && !string.IsNullOrEmpty(best.activateTrigger))
+                best.animator.SetTrigger(best.activateTrigger);
+
+            var f = typeof(Checkpoint).GetField("isActivated", BindingFlags.Instance | BindingFlags.NonPublic);
+            if (f != null) f.SetValue(best, true);
+        }
+        catch { /* ignore */ }
+    }
 }

@@ -14,7 +14,7 @@ public class PlayerHealth : MonoBehaviour, IDamageable
     private PlayerController controller;
 
     [Header("Invulnerability")]
-    public float invulnerabilityDuration = 2f;  // �as, po�as ktor�ho hr�� nem��e dosta� damage
+    public float invulnerabilityDuration = 2f;
     private bool isInvulnerable = false;
 
     void Start()

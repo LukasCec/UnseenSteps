@@ -9,6 +9,10 @@ public class MainMenuManager : MonoBehaviour
     public string playSceneName = "GameDaysScene";
     public int playSceneIndex = 3;
 
+    [Header("Data (SO)")]
+    [SerializeField] private InventoryData inventory;
+    [SerializeField] private PlayerAbilitiesData abilities;
+
     [Header("Optional: Fade/Loading")]
     public Animator fadeAnimator;          
     public float fadeDuration = 0.5f;      
@@ -22,7 +26,18 @@ public class MainMenuManager : MonoBehaviour
     public void OnPlayPressed()
     {
         PlayClick();
-        CheckpointManager.ClearSavedCheckpoint();
+
+         CheckpointManager.ClearSavedCheckpoint();
+
+        if (inventory) inventory.ResetInventory();
+        if (abilities)
+        {
+            abilities.canDoubleJump = false;
+            abilities.canDash = false;
+            abilities.canWallJump = false;
+            abilities.canWallSlide = false;
+        }
+
         StartCoroutine(LoadGame());
     }
 

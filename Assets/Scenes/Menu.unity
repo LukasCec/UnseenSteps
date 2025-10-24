@@ -2410,6 +2410,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playSceneName: Intro
   playSceneIndex: 1
+  inventory: {fileID: 11400000, guid: d0228b304b1f70d4ab362803a4034233, type: 2}
+  abilities: {fileID: 11400000, guid: f809fcae436c87949bdb76ac6c7ed229, type: 2}
   fadeAnimator: {fileID: 0}
   fadeDuration: 0.5
 --- !u!1 &832705633
