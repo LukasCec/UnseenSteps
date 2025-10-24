@@ -14,7 +14,7 @@ public class PlayerHealth : MonoBehaviour, IDamageable
     private PlayerController controller;
 
     [Header("Invulnerability")]
-    public float invulnerabilityDuration = 2f;  // èas, poèas ktorého hráè nemôe dosta damage
+    public float invulnerabilityDuration = 2f;  // ï¿½as, poï¿½as ktorï¿½ho hrï¿½ï¿½ nemï¿½ï¿½e dostaï¿½ damage
     private bool isInvulnerable = false;
 
     void Start()
@@ -62,7 +62,7 @@ public class PlayerHealth : MonoBehaviour, IDamageable
         if (health <= 0)
         {
             if (CheckpointManager.Instance != null)
-                CheckpointManager.Instance.RespawnAtCheckpoint();
+                CheckpointManager.Instance.RespawnPlayer();
         }
     }
 
